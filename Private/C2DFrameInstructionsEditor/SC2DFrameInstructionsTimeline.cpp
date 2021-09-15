@@ -1,6 +1,6 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
-#include "SFlipbookDataTimeline.h"
+#include "SC2DFrameInstructionsTimeline.h"
 #include "Rendering/DrawElements.h"
 #include "Widgets/SBoxPanel.h"
 #include "Widgets/SOverlay.h"
@@ -14,7 +14,7 @@
 #include "Widgets/Layout/SScrollBox.h"
 #include "Widgets/Colors/SColorBlock.h"
 #include "EditorStyleSet.h"
-#include "FlipbookDataEditorCommands.h"
+#include "C2DFrameInstructionsEditorCommands.h"
 #include "PaperFlipbook.h"
 #include "STimelineHeader.h"
 
@@ -32,9 +32,9 @@
 //////////////////////////////////////////////////////////////////////////
 // SFlipbookTimeline
 
-void SFlipbookDataTimeline::Construct(const FArguments& InArgs, TSharedPtr<FUICommandList> InCommandList)
+void SC2DFrameInstructionsTimeline::Construct(const FArguments& InArgs, TSharedPtr<FUICommandList> InCommandList)
 {
-	FlipbookDataBeingEdited = InArgs._FlipbookDataBeingEdited;
+	C2DFrameInstructionsBeingEdited = InArgs._C2DFrameInstructionsBeingEdited;
 	PlayTime = InArgs._PlayTime;
 	OnSelectionChanged = InArgs._OnSelectionChanged;
 	CommandList = InCommandList;
@@ -44,13 +44,13 @@ void SFlipbookDataTimeline::Construct(const FArguments& InArgs, TSharedPtr<FUICo
 	BackgroundPerFrameSlices = SNew(SHorizontalBox);
 
 	TimelineHeader = SNew(STimelineHeader)
-		.SlateUnitsPerFrame(this, &SFlipbookDataTimeline::GetSlateUnitsPerFrame)
-		.FlipbookDataBeingEdited(FlipbookDataBeingEdited)
+		.SlateUnitsPerFrame(this, &SC2DFrameInstructionsTimeline::GetSlateUnitsPerFrame)
+		.C2DFrameInstructionsBeingEdited(C2DFrameInstructionsBeingEdited)
 		.PlayTime(PlayTime);
 
 	TimelineTrack = SNew(SFlipbookTimelineTrack, CommandList)
-		.SlateUnitsPerFrame(this, &SFlipbookDataTimeline::GetSlateUnitsPerFrame)
-		.FlipbookDataBeingEdited(FlipbookDataBeingEdited)
+		.SlateUnitsPerFrame(this, &SC2DFrameInstructionsTimeline::GetSlateUnitsPerFrame)
+		.C2DFrameInstructionsBeingEdited(C2DFrameInstructionsBeingEdited)
 		.OnSelectionChanged(OnSelectionChanged);
 
 	ChildSlot
@@ -61,7 +61,7 @@ void SFlipbookDataTimeline::Construct(const FArguments& InArgs, TSharedPtr<FUICo
 			SNew(SScrollBox)
 			.Orientation(Orient_Horizontal)
 		.ScrollBarAlwaysVisible(true)
-		.OnUserScrolled(this, &SFlipbookDataTimeline::AnimationScrollBar_OnUserScrolled)
+		.OnUserScrolled(this, &SC2DFrameInstructionsTimeline::AnimationScrollBar_OnUserScrolled)
 		+SScrollBox::Slot()
 		[
 			SNew(SOverlay)
@@ -102,20 +102,20 @@ void SFlipbookDataTimeline::Construct(const FArguments& InArgs, TSharedPtr<FUICo
 		.HAlign(HAlign_Center)
 		[
 			SNew(STextBlock)
-			.Visibility(this, &SFlipbookDataTimeline::NoFramesWarningVisibility)
+			.Visibility(this, &SC2DFrameInstructionsTimeline::NoFramesWarningVisibility)
 		.Text(LOCTEXT("EmptyTimelineInstruction", "Right-click here or drop in sprites to add key frames"))
 		]
 		]
 		]
 		];
 
-	UPaperFlipbook* Flipbook = FlipbookDataBeingEdited.Get()->TargetFlipbook;
+	UPaperFlipbook* Flipbook = C2DFrameInstructionsBeingEdited.Get()->TargetFlipbook;
 	NumKeyFramesFromLastRebuild = (Flipbook != nullptr) ? Flipbook->GetNumKeyFrames() : 0;
 	NumFramesFromLastRebuild = (Flipbook != nullptr) ? Flipbook->GetNumFrames() : 0;
 	RebuildPerFrameBG();
 }
 
-void SFlipbookDataTimeline::OnDragEnter(const FGeometry& MyGeometry, const FDragDropEvent& DragDropEvent)
+void SC2DFrameInstructionsTimeline::OnDragEnter(const FGeometry& MyGeometry, const FDragDropEvent& DragDropEvent)
 {
 	SCompoundWidget::OnDragEnter(MyGeometry, DragDropEvent);
 
@@ -130,7 +130,7 @@ void SFlipbookDataTimeline::OnDragEnter(const FGeometry& MyGeometry, const FDrag
 	}
 }
 
-void SFlipbookDataTimeline::OnDragLeave(const FDragDropEvent& DragDropEvent)
+void SC2DFrameInstructionsTimeline::OnDragLeave(const FDragDropEvent& DragDropEvent)
 {
 	SCompoundWidget::OnDragLeave(DragDropEvent);
 
@@ -145,7 +145,7 @@ void SFlipbookDataTimeline::OnDragLeave(const FDragDropEvent& DragDropEvent)
 	}
 }
 
-FReply SFlipbookDataTimeline::OnDrop(const FGeometry& MyGeometry, const FDragDropEvent& DragDropEvent)
+FReply SC2DFrameInstructionsTimeline::OnDrop(const FGeometry& MyGeometry, const FDragDropEvent& DragDropEvent)
 {
 	bool bWasDropHandled = false;
 
@@ -162,7 +162,7 @@ FReply SFlipbookDataTimeline::OnDrop(const FGeometry& MyGeometry, const FDragDro
 	else if (Operation->IsOfType<FFlipbookKeyFrameDragDropOp>())
 	{
 		const auto& FrameDragDropOp = StaticCastSharedPtr<FFlipbookKeyFrameDragDropOp>(Operation);
-		if (UPaperFlipbook* ThisFlipbook = FlipbookDataBeingEdited.Get()->TargetFlipbook)
+		if (UPaperFlipbook* ThisFlipbook = C2DFrameInstructionsBeingEdited.Get()->TargetFlipbook)
 		{
 			FrameDragDropOp->AppendToFlipbook(ThisFlipbook);
 			bWasDropHandled = true;
@@ -172,7 +172,7 @@ FReply SFlipbookDataTimeline::OnDrop(const FGeometry& MyGeometry, const FDragDro
 	return bWasDropHandled ? FReply::Handled() : FReply::Unhandled();
 }
 
-void SFlipbookDataTimeline::OnAssetsDropped(const class FAssetDragDropOp& DragDropOp)
+void SC2DFrameInstructionsTimeline::OnAssetsDropped(const class FAssetDragDropOp& DragDropOp)
 {
 	//@TODO: Support inserting in addition to dropping at the end
 	TArray<FPaperFlipbookKeyFrame> NewFrames;
@@ -199,7 +199,7 @@ void SFlipbookDataTimeline::OnAssetsDropped(const class FAssetDragDropOp& DragDr
 		}
 	}
 
-	UPaperFlipbook* ThisFlipbook = FlipbookDataBeingEdited.Get()->TargetFlipbook;
+	UPaperFlipbook* ThisFlipbook = C2DFrameInstructionsBeingEdited.Get()->TargetFlipbook;
 	if (NewFrames.Num() && (ThisFlipbook != nullptr))
 	{
 		const FScopedTransaction Transaction(LOCTEXT("DroppedAssetOntoTimelineTransaction", "Insert assets as frames"));
@@ -210,12 +210,12 @@ void SFlipbookDataTimeline::OnAssetsDropped(const class FAssetDragDropOp& DragDr
 	}
 }
 
-int32 SFlipbookDataTimeline::OnPaint(const FPaintArgs& Args, const FGeometry& AllottedGeometry, const FSlateRect& MyCullingRect, FSlateWindowElementList& OutDrawElements, int32 LayerId, const FWidgetStyle& InWidgetStyle, bool bParentEnabled) const
+int32 SC2DFrameInstructionsTimeline::OnPaint(const FPaintArgs& Args, const FGeometry& AllottedGeometry, const FSlateRect& MyCullingRect, FSlateWindowElementList& OutDrawElements, int32 LayerId, const FWidgetStyle& InWidgetStyle, bool bParentEnabled) const
 {
 	LayerId = SCompoundWidget::OnPaint(Args, AllottedGeometry, MyCullingRect, OutDrawElements, LayerId, InWidgetStyle, bParentEnabled);
 
 	const float CurrentTimeSecs = PlayTime.Get();
-	UPaperFlipbook* Flipbook = FlipbookDataBeingEdited.Get()->TargetFlipbook;
+	UPaperFlipbook* Flipbook = C2DFrameInstructionsBeingEdited.Get()->TargetFlipbook;
 	const float TotalTimeSecs = (Flipbook != nullptr) ? Flipbook->GetTotalDuration() : 0.0f;
 	const int32 TotalNumFrames = (Flipbook != nullptr) ? Flipbook->GetNumFrames() : 0;
 
@@ -240,7 +240,7 @@ int32 SFlipbookDataTimeline::OnPaint(const FPaintArgs& Args, const FGeometry& Al
 	return LayerId;
 }
 
-FReply SFlipbookDataTimeline::OnMouseWheel(const FGeometry& MyGeometry, const FPointerEvent& MouseEvent)
+FReply SC2DFrameInstructionsTimeline::OnMouseWheel(const FGeometry& MyGeometry, const FPointerEvent& MouseEvent)
 {
 	if (MouseEvent.IsControlDown())
 	{
@@ -260,7 +260,7 @@ FReply SFlipbookDataTimeline::OnMouseWheel(const FGeometry& MyGeometry, const FP
 	}
 }
 
-TSharedRef<SWidget> SFlipbookDataTimeline::GenerateContextMenu()
+TSharedRef<SWidget> SC2DFrameInstructionsTimeline::GenerateContextMenu()
 {
 	FMenuBuilder MenuBuilder(true, CommandList);
 	MenuBuilder.BeginSection("KeyframeActions", LOCTEXT("KeyframeActionsSectionHeader", "Keyframe Actions"));
@@ -268,14 +268,14 @@ TSharedRef<SWidget> SFlipbookDataTimeline::GenerateContextMenu()
 	// 		MenuBuilder.AddMenuEntry(FGenericCommands::Get().Cut);
 	// 		MenuBuilder.AddMenuEntry(FGenericCommands::Get().Copy);
 	// 		MenuBuilder.AddMenuEntry(FGenericCommands::Get().Paste);
-	MenuBuilder.AddMenuEntry(FFlipbookDataEditorCommands::Get().AddNewFrame);
+	MenuBuilder.AddMenuEntry(FC2DFrameInstructionsEditorCommands::Get().AddNewFrame);
 
 	MenuBuilder.EndSection();
 
 	return MenuBuilder.MakeWidget();
 }
 
-FReply SFlipbookDataTimeline::OnMouseButtonUp(const FGeometry& MyGeometry, const FPointerEvent& MouseEvent)
+FReply SC2DFrameInstructionsTimeline::OnMouseButtonUp(const FGeometry& MyGeometry, const FPointerEvent& MouseEvent)
 {
 	if (MouseEvent.GetEffectingButton() == EKeys::RightMouseButton)
 	{
@@ -291,14 +291,14 @@ FReply SFlipbookDataTimeline::OnMouseButtonUp(const FGeometry& MyGeometry, const
 	}
 }
 
-void SFlipbookDataTimeline::Tick(const FGeometry& AllottedGeometry, const double InCurrentTime, const float InDeltaTime)
+void SC2DFrameInstructionsTimeline::Tick(const FGeometry& AllottedGeometry, const double InCurrentTime, const float InDeltaTime)
 {
 	CheckForRebuild();
 }
 
-void SFlipbookDataTimeline::CheckForRebuild(bool bRebuildAll)
+void SC2DFrameInstructionsTimeline::CheckForRebuild(bool bRebuildAll)
 {
-	UPaperFlipbook* Flipbook = FlipbookDataBeingEdited.Get()->TargetFlipbook;
+	UPaperFlipbook* Flipbook = C2DFrameInstructionsBeingEdited.Get()->TargetFlipbook;
 
 	const int32 NewNumKeyframes = (Flipbook != nullptr) ? Flipbook->GetNumKeyFrames() : 0;
 	if ((NewNumKeyframes != NumKeyFramesFromLastRebuild) || bRebuildAll)
@@ -316,14 +316,14 @@ void SFlipbookDataTimeline::CheckForRebuild(bool bRebuildAll)
 	}
 }
 
-EVisibility SFlipbookDataTimeline::NoFramesWarningVisibility() const
+EVisibility SC2DFrameInstructionsTimeline::NoFramesWarningVisibility() const
 {
-	UPaperFlipbook* Flipbook = FlipbookDataBeingEdited.Get()->TargetFlipbook;
+	UPaperFlipbook* Flipbook = C2DFrameInstructionsBeingEdited.Get()->TargetFlipbook;
 	const int32 TotalNumFrames = (Flipbook != nullptr) ? Flipbook->GetNumFrames() : 0;
 	return (TotalNumFrames == 0) ? EVisibility::Visible : EVisibility::Collapsed;
 }
 
-void SFlipbookDataTimeline::RebuildPerFrameBG()
+void SC2DFrameInstructionsTimeline::RebuildPerFrameBG()
 {
 	const FLinearColor BackgroundColors[2] = { FLinearColor(1.0f, 1.0f, 1.0f, 0.05f), FLinearColor(0.0f, 0.0f, 0.0f, 0.05f) };
 
@@ -345,7 +345,7 @@ void SFlipbookDataTimeline::RebuildPerFrameBG()
 	}
 }
 
-void SFlipbookDataTimeline::AnimationScrollBar_OnUserScrolled(float ScrollOffset)
+void SC2DFrameInstructionsTimeline::AnimationScrollBar_OnUserScrolled(float ScrollOffset)
 {
 	AnimationScrollBarPosition = ScrollOffset;
 }

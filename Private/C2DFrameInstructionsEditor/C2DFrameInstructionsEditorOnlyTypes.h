@@ -5,13 +5,13 @@
 #include "CoreMinimal.h"
 #include "UObject/ObjectMacros.h"
 #include "Engine/Texture2D.h"
-#include "FlipbookDataEditorOnlyTypes.generated.h"
+#include "C2DFrameInstructionsEditorOnlyTypes.generated.h"
 
 class UMaterialInterface;
 
 // The kind of collision that a Paper2D asset or component might participate in
 UENUM()
-namespace EFlipbookDataCollisionMode
+namespace EC2DFrameInstructionsCollisionMode
 {
 	enum Type
 	{
@@ -25,9 +25,9 @@ namespace EFlipbookDataCollisionMode
 	};
 }
 
-// The type of a shape in a FlipbookData geometry structure
+// The type of a shape in a C2DFrameInstructions geometry structure
 UENUM()
-enum class EFlipbookDataShapeType
+enum class EC2DFrameInstructionsShapeType
 {
 	/** Box/Rectangular prism (size defined by BoxSize) */
 	Box,
@@ -41,12 +41,12 @@ enum class EFlipbookDataShapeType
 //
 //// A single piece of geometry (e.g., a polygon which may be convex or concave, a box, or a circle)
 //USTRUCT()
-//struct COMBAT2DEDITOR_API FFlipbookDataGeometryShape
+//struct COMBAT2DEDITOR_API FC2DFrameInstructionsGeometryShape
 //{
 //	GENERATED_USTRUCT_BODY()
 //
-//	FFlipbookDataGeometryShape()
-//	: ShapeType(EFlipbookDataShapeType::Box)
+//	FC2DFrameInstructionsGeometryShape()
+//	: ShapeType(EC2DFrameInstructionsShapeType::Box)
 //	, BoxSize(ForceInitToZero)
 //	, BoxPosition(ForceInitToZero)
 //	, Rotation(0.0f)
@@ -57,7 +57,7 @@ enum class EFlipbookDataShapeType
 //
 //	// The type of this piece of geometry
 //	UPROPERTY(Category=Physics, VisibleAnywhere)
-//	EFlipbookDataShapeType ShapeType;
+//	EC2DFrameInstructionsShapeType ShapeType;
 //
 //	// Vertices for the polygon (valid for Box and Polygon, but empty for Circle)
 //	UPROPERTY(Category=Physics, EditAnywhere)
@@ -84,7 +84,7 @@ enum class EFlipbookDataShapeType
 //	// Is this shape valid (e.g., at least 3 vertices for a polygon)?
 //	bool IsShapeValid() const
 //	{
-//		return (ShapeType != EFlipbookDataShapeType::Polygon) || (Vertices.Num() > 2);
+//		return (ShapeType != EC2DFrameInstructionsShapeType::Polygon) || (Vertices.Num() > 2);
 //	}
 //
 //	FVector2D ConvertTextureSpaceToShapeSpace(const FVector2D& TextureSpacePoint) const
@@ -141,16 +141,16 @@ enum class EFlipbookDataShapeType
 //};
 
 
-// Method of specifying polygons for a FlipbookData's render or collision data
+// Method of specifying polygons for a C2DFrameInstructions's render or collision data
 UENUM()
-namespace EFlipbookDataPolygonMode
+namespace EC2DFrameInstructionsPolygonMode
 {
 	enum Type
 	{
-		/** Use the bounding box of the source FlipbookData (no optimization) */
+		/** Use the bounding box of the source C2DFrameInstructions (no optimization) */
 		SourceBoundingBox,
 
-		/** Tighten the bounding box around the FlipbookData to exclude fully transparent areas (the default) */
+		/** Tighten the bounding box around the C2DFrameInstructions to exclude fully transparent areas (the default) */
 		TightBoundingBox,
 
 		/** Shrink-wrapped geometry */
@@ -165,17 +165,17 @@ namespace EFlipbookDataPolygonMode
 }
 //
 //USTRUCT()
-//struct COMBAT2DEDITOR_API FFlipbookDataGeometryCollection
+//struct COMBAT2DEDITOR_API FC2DFrameInstructionsGeometryCollection
 //{
 //	GENERATED_USTRUCT_BODY()
 //
 //	// List of shapes
 //	UPROPERTY(Category=PolygonData, EditAnywhere, AdvancedDisplay)
-//	TArray<FFlipbookDataGeometryShape> Shapes;
+//	TArray<FC2DFrameInstructionsGeometryShape> Shapes;
 //
 //	// The geometry type (automatic / manual)
 //	UPROPERTY(Category=PolygonData, EditAnywhere)
-//	TEnumAsByte<EFlipbookDataPolygonMode::Type> GeometryType;
+//	TEnumAsByte<EC2DFrameInstructionsPolygonMode::Type> GeometryType;
 //
 //	// Size of a single subdivision (in pixels) in X (for Diced mode)
 //	UPROPERTY(Category=PolygonData, EditAnywhere)
@@ -202,8 +202,8 @@ namespace EFlipbookDataPolygonMode
 //	float SimplifyEpsilon;
 //
 //public:
-//	FFlipbookDataGeometryCollection()
-//		: GeometryType(EFlipbookDataPolygonMode::TightBoundingBox)
+//	FC2DFrameInstructionsGeometryCollection()
+//		: GeometryType(EC2DFrameInstructionsPolygonMode::TightBoundingBox)
 //		, PixelsPerSubdivisionX(32)
 //		, PixelsPerSubdivisionY(32)
 //		, bAvoidVertexMerging(false)
@@ -229,36 +229,36 @@ namespace EFlipbookDataPolygonMode
 //	void Triangulate(TArray<FVector2D>& Target, bool bIncludeBoxes) const;
 //};
 //
-//// A helper class for converting one or more FFlipbookDataGeometryCollection objects into a UBodySetup object
-//struct FFlipbookDataGeometryCollisionBuilderBase
+//// A helper class for converting one or more FC2DFrameInstructionsGeometryCollection objects into a UBodySetup object
+//struct FC2DFrameInstructionsGeometryCollisionBuilderBase
 //{
 //protected:
 //	class UBodySetup* MyBodySetup;
 //	float UnrealUnitsPerPixel;
 //	float CollisionThickness;
 //	float ZOffsetAmount;
-//	EFlipbookDataCollisionMode::Type CollisionDomain;
+//	EC2DFrameInstructionsCollisionMode::Type CollisionDomain;
 //
 //public:
-//	FFlipbookDataGeometryCollisionBuilderBase(class UBodySetup* InBodySetup);
+//	FC2DFrameInstructionsGeometryCollisionBuilderBase(class UBodySetup* InBodySetup);
 //
-//	virtual void ProcessGeometry(const FFlipbookDataGeometryCollection& InGeometry);
+//	virtual void ProcessGeometry(const FC2DFrameInstructionsGeometryCollection& InGeometry);
 //	virtual void Finalize();
 //protected:
-//	void AddBoxCollisionShapesToBodySetup(const FFlipbookDataGeometryCollection& InGeometry);
-//	void AddPolygonCollisionShapesToBodySetup(const FFlipbookDataGeometryCollection& InGeometry);
-//	void AddCircleCollisionShapesToBodySetup(const FFlipbookDataGeometryCollection& InGeometry);
+//	void AddBoxCollisionShapesToBodySetup(const FC2DFrameInstructionsGeometryCollection& InGeometry);
+//	void AddPolygonCollisionShapesToBodySetup(const FC2DFrameInstructionsGeometryCollection& InGeometry);
+//	void AddCircleCollisionShapesToBodySetup(const FC2DFrameInstructionsGeometryCollection& InGeometry);
 //
 //	virtual FVector2D ConvertTextureSpaceToPivotSpace(const FVector2D& Input) const;
 //	virtual FVector2D ConvertTextureSpaceToPivotSpaceNoTranslation(const FVector2D& Input) const;
 //};
 //
 //USTRUCT()
-//struct FFlipbookDataAssetInitParameters
+//struct FC2DFrameInstructionsAssetInitParameters
 //{
 //	GENERATED_USTRUCT_BODY()
 //
-//	FFlipbookDataAssetInitParameters()
+//	FC2DFrameInstructionsAssetInitParameters()
 //		: Texture(nullptr)
 //		, Offset(ForceInitToZero)
 //		, Dimension(ForceInitToZero)
@@ -306,7 +306,7 @@ namespace EFlipbookDataPolygonMode
 //	// Should we apply the PixelsPerUnrealUnit, or leave the value as it was
 //	bool bOverridePixelsPerUnrealUnit;
 //
-//	// The scaling factor between pixels and Unreal units (cm) to use (e.g., 0.64 would make a 64 pixel wide FlipbookData take up 100 cm)
+//	// The scaling factor between pixels and Unreal units (cm) to use (e.g., 0.64 would make a 64 pixel wide C2DFrameInstructions take up 100 cm)
 //	float PixelsPerUnrealUnit;
 //
 //	// The material to override the default value with, if set
@@ -317,7 +317,7 @@ namespace EFlipbookDataPolygonMode
 //};
 
 UENUM()
-namespace EFlipbookDataPivotMode
+namespace EC2DFrameInstructionsPivotMode
 {
 	enum Type
 	{

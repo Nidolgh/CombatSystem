@@ -1,11 +1,11 @@
-#include "FlipbookDataEditorCommands.h"
+#include "C2DFrameInstructionsEditorCommands.h"
 
-#define LOCTEXT_NAMESPACE "FlipbookDataEditor"
+#define LOCTEXT_NAMESPACE "C2DFrameInstructionsEditor"
 
 //////////////////////////////////////////////////////////////////////////
-// FFlipbookDataEditorCommands
+// FC2DFrameInstructionsEditorCommands
 
-void FFlipbookDataEditorCommands::RegisterCommands()
+void FC2DFrameInstructionsEditorCommands::RegisterCommands()
 {
 	// Show toggles
 	UI_COMMAND(SetShowGrid, "Grid", "Displays the viewport grid.", EUserInterfaceActionType::ToggleButton, FInputChord());

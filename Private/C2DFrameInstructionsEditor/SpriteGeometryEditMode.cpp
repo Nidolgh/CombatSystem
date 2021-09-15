@@ -11,6 +11,7 @@
 #include "SpriteEditorOnlyTypes.h"
 #include "SpriteEditorSelections.h"
 #include "SpriteGeometryEditCommands.h"
+#include "Utils.h"
 #include "PhysicsEngine/BodySetup.h"
 
 
@@ -55,7 +56,7 @@ void FSpriteGeometryEditMode::DrawHUD(FEditorViewportClient* ViewportClient, FVi
 	{
 		for (size_t i = 0; i < KeyFrameInstructions->Num(); i++)
 		{
-			FFlipbookDataKeyFrameInstruction* FrameInstruction = &KeyFrameInstructions->GetData()[i];
+			FC2DFrameInstructionsKeyFrameInstruction* FrameInstruction = &KeyFrameInstructions->GetData()[i];
 			FSpriteGeometryCollection* GeoColl = &FrameInstruction->CollisionGeometry;
 
 			SetActiveGeometryColor(FrameInstruction->InstructionType, ((*InstructionToEdit) == i));
@@ -84,7 +85,7 @@ void FSpriteGeometryEditMode::Render(const FSceneView* View, FViewport* Viewport
 	{
 		for (size_t i = 0; i < KeyFrameInstructions->Num(); i++)
 		{
-			FFlipbookDataKeyFrameInstruction* FrameInstruction = &KeyFrameInstructions->GetData()[i];
+			FC2DFrameInstructionsKeyFrameInstruction* FrameInstruction = &KeyFrameInstructions->GetData()[i];
 			FSpriteGeometryCollection* GeoColl = &FrameInstruction->CollisionGeometry;
 			
 			SetActiveGeometryColor(FrameInstruction->InstructionType, ((*InstructionToEdit) == i));
@@ -105,6 +106,7 @@ bool FSpriteGeometryEditMode::HandleClick(FEditorViewportClient* InViewportClien
 
 	const bool bIsCtrlKeyDown = Viewport->KeyState(EKeys::LeftControl) || Viewport->KeyState(EKeys::RightControl);
 	const bool bIsShiftKeyDown = Viewport->KeyState(EKeys::LeftShift) || Viewport->KeyState(EKeys::RightShift);
+	const bool bIsAltKeyDown = Viewport->KeyState(EKeys::LeftAlt) || Viewport->KeyState(EKeys::RightAlt);
 	const bool bIsAltKeyDown = Viewport->KeyState(EKeys::LeftAlt) || Viewport->KeyState(EKeys::RightAlt);
 	bool bHandled = false;
 
@@ -173,18 +175,18 @@ bool FSpriteGeometryEditMode::HandleClick(FEditorViewportClient* InViewportClien
 
 		bHandled = true;
 	}
-	// 	else if (HWidgetUtilProxy* PivotProxy = HitProxyCast<HWidgetUtilProxy>(HitProxy))
-	// 	{
-	// 		//const bool bUserWantsPaint = bIsLeftButtonDown && ( !GetDefault<ULevelEditorViewportSettings>()->bLeftMouseDragMovesCamera ||  bIsCtrlDown );
-	// 		//findme
-	// 		WidgetAxis = WidgetProxy->Axis;
-	// 
-	// 			// Calculate the screen-space directions for this drag.
-	// 			FSceneViewFamilyContext ViewFamily( FSceneViewFamily::ConstructionValues( Viewport, GetScene(), EngineShowFlags ));
-	// 			FSceneView* View = CalcSceneView(&ViewFamily);
-	// 			WidgetProxy->CalcVectors(View, FViewportClick(View, this, Key, Event, HitX, HitY), LocalManipulateDir, WorldManipulateDir, DragX, DragY);
-	// 			bHandled = true;
-	// 	}
+	else if (HWidgetUtilProxy* PivotProxy = HitProxyCast<HWidgetUtilProxy>(HitProxy))
+	{
+		const bool bUserWantsPaint = bIsLeftButtonDown && ( !GetDefault<ULevelEditorViewportSettings>()->bLeftMouseDragMovesCamera ||  bIsCtrlDown );
+		//findme
+		WidgetAxis = WidgetProxy->Axis;
+	
+			// Calculate the screen-space directions for this drag.
+			FSceneViewFamilyContext ViewFamily( FSceneViewFamily::ConstructionValues( Viewport, GetScene(), EngineShowFlags ));
+			FSceneView* View = CalcSceneView(&ViewFamily);
+			WidgetProxy->CalcVectors(View, FViewportClick(View, this, Key, Event, HitX, HitY), LocalManipulateDir, WorldManipulateDir, DragX, DragY);
+			bHandled = true;
+	}
 	else
 	{
 		if (IsEditingGeometry() && !SpriteGeometryHelper.IsAddingPolygon())
@@ -363,7 +365,7 @@ void FSpriteGeometryEditMode::SetGeometryColors(const FLinearColor& NewVertexCol
 	NegativeGeometryVertexColor = NewNegativeVertexColor;
 }
 
-void FSpriteGeometryEditMode::SetKeyFrameInstructionsBeingEdited(TArray<FFlipbookDataKeyFrameInstruction>* NewKeyFrameInstructions, int32* NewInstructionToEdit, bool bInAllowCircles, bool bInAllowSubtractivePolygons)
+void FSpriteGeometryEditMode::SetKeyFrameInstructionsBeingEdited(TArray<FC2DFrameInstructionsKeyFrameInstruction>* NewKeyFrameInstructions, int32* NewInstructionToEdit, bool bInAllowCircles, bool bInAllowSubtractivePolygons)
 {
 	InstructionToEdit = NewInstructionToEdit;
 	KeyFrameInstructions = NewKeyFrameInstructions;
@@ -373,7 +375,7 @@ void FSpriteGeometryEditMode::SetKeyFrameInstructionsBeingEdited(TArray<FFlipboo
 
 void FSpriteGeometryEditMode::BindCommands(TSharedPtr<FUICommandList> CommandList)
 {
-	const FFlipbookDataGeometryEditCommands& Commands = FFlipbookDataGeometryEditCommands::Get();
+	const FC2DFrameInstructionsGeometryEditCommands& Commands = FC2DFrameInstructionsGeometryEditCommands::Get();
 
 	// Show toggles
 	//CommandList->MapAction(

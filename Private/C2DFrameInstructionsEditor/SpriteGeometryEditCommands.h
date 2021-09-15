@@ -6,11 +6,11 @@
 #include "Framework/Commands/Commands.h"
 #include "Combat2DStyle.h"
 
-class FFlipbookDataGeometryEditCommands : public TCommands<FFlipbookDataGeometryEditCommands>
+class FC2DFrameInstructionsGeometryEditCommands : public TCommands<FC2DFrameInstructionsGeometryEditCommands>
 {
 public:
-	FFlipbookDataGeometryEditCommands()
-		: TCommands<FFlipbookDataGeometryEditCommands>(
+	FC2DFrameInstructionsGeometryEditCommands()
+		: TCommands<FC2DFrameInstructionsGeometryEditCommands>(
 			TEXT("SpriteGeometryEditor"), // Context name for fast lookup
 			NSLOCTEXT("Contexts", "SpriteGeometryEditor", "Sprite Geometry Editor"), // Localized context name for displaying
 			NAME_None, // Parent
@@ -29,7 +29,6 @@ public:
 
 	// Geometry editing commands
 	TSharedPtr<FUICommandInfo> DeleteSelection;
-	TSharedPtr<FUICommandInfo> SplitEdge;
 	TSharedPtr<FUICommandInfo> AddBoxShape;
 	TSharedPtr<FUICommandInfo> AddCircleShape;
 	TSharedPtr<FUICommandInfo> ToggleAddPolygonMode;

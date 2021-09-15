@@ -7,7 +7,7 @@
 /*
  *
  */
-class FAssetTypeActions_FlipbookData : public FAssetTypeActions_Base
+class FAssetTypeActions_C2DFrameInstructions : public FAssetTypeActions_Base
 {
 public:
 	// IAssetTypeActions interface

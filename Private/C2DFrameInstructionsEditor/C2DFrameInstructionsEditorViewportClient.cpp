@@ -1,6 +1,6 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
-#include "FlipbookDataEditorViewportClient.h"
+#include "C2DFrameInstructionsEditorViewportClient.h"
 
 #include "Engine/CollisionProfile.h"
 
@@ -9,13 +9,13 @@
 #include "AssetEditorModeManager.h"
 #include "IContentBrowserSingleton.h"
 #include "CanvasTypes.h"
-#include "FlipbookDataEditor.h"
-#include "FlipbookDataEditorSettings.h"
+#include "C2DFrameInstructionsEditor.h"
+#include "C2DFrameInstructionsEditorSettings.h"
 
 #include "PaperFlipbookComponent.h"
 #include "SpriteGeometryEditCommands.h"
 
-#define LOCTEXT_NAMESPACE "FlipbookDataEditor"
+#define LOCTEXT_NAMESPACE "C2DFrameInstructionsEditor"
 
 //////////////////////////////////////////////////////////////////////////
 // FSelectionTypes
@@ -49,20 +49,20 @@ namespace SpriteEditingConstants
 }
 
 //////////////////////////////////////////////////////////////////////////
-// FFlipbookDataEditorViewportClient
+// FC2DFrameInstructionsEditorViewportClient
 
-FFlipbookDataEditorViewportClient::FFlipbookDataEditorViewportClient(TWeakPtr<FFlipbookDataEditor> InSpriteEditor, TWeakPtr<class SEditorViewport> InFlipbookDataEditorViewportPtr)
+FC2DFrameInstructionsEditorViewportClient::FC2DFrameInstructionsEditorViewportClient(TWeakPtr<FC2DFrameInstructionsEditor> InSpriteEditor, TWeakPtr<class SEditorViewport> InC2DFrameInstructionsEditorViewportPtr)
 	:
-	FEditorViewportClient(new FAssetEditorModeManager(), nullptr, InFlipbookDataEditorViewportPtr)
-	, FlipbookDataEditorPtr(InSpriteEditor)
+	FEditorViewportClient(new FAssetEditorModeManager(), nullptr, InC2DFrameInstructionsEditorViewportPtr)
+	, C2DFrameInstructionsEditorPtr(InSpriteEditor)
 {
-	check(FlipbookDataEditorPtr.IsValid());
+	check(C2DFrameInstructionsEditorPtr.IsValid());
 
 	// The tile map editor fully supports mode tools and isn't doing any incompatible stuff with the Widget
 	Widget->SetUsesEditorModeTools(ModeTools);
 
-	FlipbookDataBeingEdited = InSpriteEditor.Pin()->GetFlipbookDataBeingEdited();
-	FlipbookBeingEditedLastFrame = FlipbookDataBeingEdited.Get()->TargetFlipbook;
+	C2DFrameInstructionsBeingEdited = InSpriteEditor.Pin()->GetC2DFrameInstructionsBeingEdited();
+	FlipbookBeingEditedLastFrame = C2DFrameInstructionsBeingEdited.Get()->TargetFlipbook;
 	PreviewScene = &OwnedPreviewScene;
 	((FAssetEditorModeManager*)ModeTools)->SetPreviewScene(PreviewScene);
 	
@@ -71,7 +71,7 @@ FFlipbookDataEditorViewportClient::FFlipbookDataEditorViewportClient(TWeakPtr<FF
 	// Create a render component for the sprite being edited
 	AnimatedRenderComponent = NewObject<UPaperFlipbookComponent>();
 	AnimatedRenderComponent->SetCollisionProfileName(UCollisionProfile::BlockAll_ProfileName);
-	AnimatedRenderComponent->SetFlipbook(FlipbookDataBeingEdited.Get()->TargetFlipbook);
+	AnimatedRenderComponent->SetFlipbook(C2DFrameInstructionsBeingEdited.Get()->TargetFlipbook);
 	AnimatedRenderComponent->UpdateBounds();
 	AnimatedRenderComponent->Stop();
 	
@@ -79,7 +79,7 @@ FFlipbookDataEditorViewportClient::FFlipbookDataEditorViewportClient(TWeakPtr<FF
 	
 	bShowPivot = true;
 
-	//DrawHelper.bDrawGrid = GetDefault<UFlipbookDataEditorSettings>()->bShowGridByDefault;
+	//DrawHelper.bDrawGrid = GetDefault<UC2DFrameInstructionsEditorSettings>()->bShowGridByDefault;
 	DrawHelper.bDrawGrid = 0;
 
 	EngineShowFlags.DisableAdvancedFeatures();
@@ -102,7 +102,7 @@ FFlipbookDataEditorViewportClient::FFlipbookDataEditorViewportClient(TWeakPtr<FF
 		FLinearColor(1.f, 0.f, 1.f, 1.f));
 }
 
-void FFlipbookDataEditorViewportClient::DrawCanvas(FViewport& InViewport, FSceneView& View, FCanvas& Canvas)
+void FC2DFrameInstructionsEditorViewportClient::DrawCanvas(FViewport& InViewport, FSceneView& View, FCanvas& Canvas)
 {
 	FEditorViewportClient::DrawCanvas(InViewport, View, Canvas);
 	
@@ -129,7 +129,7 @@ void FFlipbookDataEditorViewportClient::DrawCanvas(FViewport& InViewport, FScene
 	}
 }
 
-void FFlipbookDataEditorViewportClient::Draw(const FSceneView* View, FPrimitiveDrawInterface* PDI)
+void FC2DFrameInstructionsEditorViewportClient::Draw(const FSceneView* View, FPrimitiveDrawInterface* PDI)
 {
 	FEditorViewportClient::Draw(View, PDI);
 	
@@ -142,16 +142,16 @@ void FFlipbookDataEditorViewportClient::Draw(const FSceneView* View, FPrimitiveD
 }
 
 
-void FFlipbookDataEditorViewportClient::Tick(float DeltaSeconds)
+void FC2DFrameInstructionsEditorViewportClient::Tick(float DeltaSeconds)
 {
 	GeometryEditMode->Tick(this, DeltaSeconds);
 
-	CurrentKeyFrameData = FlipbookDataEditorPtr.Pin().Get()->CreateKeyFrameDataOnCurrentFrame();
+	CurrentKeyFrameData = C2DFrameInstructionsEditorPtr.Pin().Get()->CreateKeyFrameDataOnCurrentFrame();
 	if (CurrentKeyFrameData != nullptr && CurrentKeyFrameData != LastKeyFrameData) 
 	{
-		  const int32 curFrame = FlipbookDataEditorPtr.Pin().Get()->GetCurrentFrame();
+		  const int32 curFrame = C2DFrameInstructionsEditorPtr.Pin().Get()->GetCurrentFrame();
 		  FSpriteGeometryCollection* GeometryCollectionInstruction = CurrentKeyFrameData->KeyFrameInstructions.IsValidIndex(curFrame) ? &CurrentKeyFrameData->KeyFrameInstructions[0].CollisionGeometry : nullptr;
-		  int32* InsID = FlipbookDataEditorPtr.Pin().Get()->GetGeoPropTabBody()->GetButtonFrameID();
+		  int32* InsID = C2DFrameInstructionsEditorPtr.Pin().Get()->GetGeoPropTabBody()->GetButtonFrameID();
 		  
 	      if (CurrentKeyFrameData->KeyFrameInstructions.Num() != 0)
 	      {
@@ -166,7 +166,7 @@ void FFlipbookDataEditorViewportClient::Tick(float DeltaSeconds)
 	
 	if (AnimatedRenderComponent.IsValid())
 	{		
-		UPaperFlipbook* Flipbook = FlipbookDataBeingEdited.Get()->TargetFlipbook;
+		UPaperFlipbook* Flipbook = C2DFrameInstructionsBeingEdited.Get()->TargetFlipbook;
 
 		if (Flipbook != FlipbookBeingEditedLastFrame.Get())
 		{
@@ -204,7 +204,7 @@ void FFlipbookDataEditorViewportClient::Tick(float DeltaSeconds)
 	}
 }
 
-void FFlipbookDataEditorViewportClient::ProcessClick(FSceneView& View, HHitProxy* HitProxy, FKey Key, EInputEvent Event, uint32 HitX, uint32 HitY)
+void FC2DFrameInstructionsEditorViewportClient::ProcessClick(FSceneView& View, HHitProxy* HitProxy, FKey Key, EInputEvent Event, uint32 HitX, uint32 HitY)
 {
 	const FViewportClick Click(&View, this, Key, Event, HitX, HitY);
 	const bool bIsCtrlKeyDown = Viewport->KeyState(EKeys::LeftControl) || Viewport->KeyState(EKeys::RightControl);
@@ -215,7 +215,7 @@ void FFlipbookDataEditorViewportClient::ProcessClick(FSceneView& View, HHitProxy
 	GeometryEditMode->HandleClick(this, HitProxy, Click);
 }
 
-bool FFlipbookDataEditorViewportClient::InputKey(FViewport* InViewport, int32 ControllerId, FKey Key, EInputEvent Event, float AmountDepressed, bool bGamepad)
+bool FC2DFrameInstructionsEditorViewportClient::InputKey(FViewport* InViewport, int32 ControllerId, FKey Key, EInputEvent Event, float AmountDepressed, bool bGamepad)
 {
 	bool bHandled = false;
 	FInputEventState InputState(InViewport, Key, Event);
@@ -226,36 +226,36 @@ bool FFlipbookDataEditorViewportClient::InputKey(FViewport* InViewport, int32 Co
 	return (bHandled) ? true : FEditorViewportClient::InputKey(InViewport, ControllerId, Key, Event, AmountDepressed, bGamepad);
 }
 
-FLinearColor FFlipbookDataEditorViewportClient::GetBackgroundColor() const
+FLinearColor FC2DFrameInstructionsEditorViewportClient::GetBackgroundColor() const
 {
-	return GetDefault<UFlipbookDataEditorSettings>()->BackgroundColor;
+	return GetDefault<UC2DFrameInstructionsEditorSettings>()->BackgroundColor;
 }
 
-FVector2D FFlipbookDataEditorViewportClient::SelectedItemConvertWorldSpaceDeltaToLocalSpace(const FVector& WorldSpaceDelta) const
+FVector2D FC2DFrameInstructionsEditorViewportClient::SelectedItemConvertWorldSpaceDeltaToLocalSpace(const FVector& WorldSpaceDelta) const
 {
 	UPaperSprite* Sprite = GetSpriteOnCurrentFrame();
 	return Sprite == nullptr ? FVector2D(0.f) : Sprite->ConvertWorldSpaceDeltaToTextureSpace(WorldSpaceDelta);
 }
 
-FVector2D FFlipbookDataEditorViewportClient::WorldSpaceToTextureSpace(const FVector& SourcePoint) const
+FVector2D FC2DFrameInstructionsEditorViewportClient::WorldSpaceToTextureSpace(const FVector& SourcePoint) const
 {
 	UPaperSprite* Sprite = GetSpriteOnCurrentFrame();
 	return Sprite == nullptr ? FVector2D(0.f) : Sprite->ConvertWorldSpaceToTextureSpace(SourcePoint);
 }
 
-FVector FFlipbookDataEditorViewportClient::TextureSpaceToWorldSpace(const FVector2D& SourcePoint) const
+FVector FC2DFrameInstructionsEditorViewportClient::TextureSpaceToWorldSpace(const FVector2D& SourcePoint) const
 {
 	UPaperSprite* Sprite = GetSpriteOnCurrentFrame();
 	return Sprite == nullptr ? FVector(0.f) : Sprite->ConvertTextureSpaceToWorldSpace(SourcePoint);
 }
 
-float FFlipbookDataEditorViewportClient::SelectedItemGetUnitsPerPixel() const
+float FC2DFrameInstructionsEditorViewportClient::SelectedItemGetUnitsPerPixel() const
 {
 	UPaperSprite* Sprite = GetSpriteOnCurrentFrame();
 	return Sprite == nullptr ? 0.f : Sprite->GetUnrealUnitsPerPixel();
 }
 
-void FFlipbookDataEditorViewportClient::BeginTransaction(const FText& SessionName)
+void FC2DFrameInstructionsEditorViewportClient::BeginTransaction(const FText& SessionName)
 {
 	if (ScopedTransaction == nullptr)
 	{
@@ -266,7 +266,7 @@ void FFlipbookDataEditorViewportClient::BeginTransaction(const FText& SessionNam
 	}
 }
 
-void FFlipbookDataEditorViewportClient::MarkTransactionAsDirty()
+void FC2DFrameInstructionsEditorViewportClient::MarkTransactionAsDirty()
 {
 	bManipulationDirtiedSomething = true;
 	Invalidate();
@@ -274,7 +274,7 @@ void FFlipbookDataEditorViewportClient::MarkTransactionAsDirty()
 	// (maybe passing in Interactive - if so, the EndTransaction PostEditChange needs to be a ValueSet)
 }
 
-void FFlipbookDataEditorViewportClient::EndTransaction()
+void FC2DFrameInstructionsEditorViewportClient::EndTransaction()
 {
 	bManipulationDirtiedSomething = false;
 
@@ -285,43 +285,43 @@ void FFlipbookDataEditorViewportClient::EndTransaction()
 	}
 }
 
-void FFlipbookDataEditorViewportClient::InvalidateViewportAndHitProxies()
+void FC2DFrameInstructionsEditorViewportClient::InvalidateViewportAndHitProxies()
 {
 	Viewport->Invalidate();
 }
 
-void FFlipbookDataEditorViewportClient::RequestFocusOnSelection(bool bInstant)
+void FC2DFrameInstructionsEditorViewportClient::RequestFocusOnSelection(bool bInstant)
 {
 	bDeferZoomToSprite = true;
 	bDeferZoomToSpriteIsInstant = bInstant;
 }
 
-UPaperSprite* FFlipbookDataEditorViewportClient::GetSpriteOnCurrentFrame() const
+UPaperSprite* FC2DFrameInstructionsEditorViewportClient::GetSpriteOnCurrentFrame() const
 {
-	const int32 curFrame = FlipbookDataEditorPtr.Pin().Get()->GetCurrentFrame();
-	return FlipbookDataBeingEdited.Get()->TargetFlipbook->GetSpriteAtFrame(curFrame);
+	const int32 curFrame = C2DFrameInstructionsEditorPtr.Pin().Get()->GetCurrentFrame();
+	return C2DFrameInstructionsBeingEdited.Get()->TargetFlipbook->GetSpriteAtFrame(curFrame);
 }
 
-FFlipbookDataKeyFrame* FFlipbookDataEditorViewportClient::GetKeyFrameDataOnCurrentFrame() const
+FC2DFrameInstructionsKeyFrame* FC2DFrameInstructionsEditorViewportClient::GetKeyFrameDataOnCurrentFrame() const
 {
-	const int32 curFrame = FlipbookDataEditorPtr.Pin().Get()->GetCurrentFrame();
+	const int32 curFrame = C2DFrameInstructionsEditorPtr.Pin().Get()->GetCurrentFrame();
 	
-	if (FlipbookDataBeingEdited.Get()->KeyFrameArray.IsValidIndex(curFrame))
+	if (C2DFrameInstructionsBeingEdited.Get()->KeyFrameArray.IsValidIndex(curFrame))
 	{
-		return &FlipbookDataBeingEdited.Get()->KeyFrameArray[curFrame];
+		return &C2DFrameInstructionsBeingEdited.Get()->KeyFrameArray[curFrame];
 	}
 	
 	return nullptr;
 }
 
-UPaperFlipbookComponent * FFlipbookDataEditorViewportClient::GetPreviewComponent() const
+UPaperFlipbookComponent * FC2DFrameInstructionsEditorViewportClient::GetPreviewComponent() const
 {
   return AnimatedRenderComponent.Get();
 }
 
-void FFlipbookDataEditorViewportClient::BindCommands()
+void FC2DFrameInstructionsEditorViewportClient::BindCommands()
 {	
-	const FFlipbookDataGeometryEditCommands& Commands = FFlipbookDataGeometryEditCommands::Get();
+	const FC2DFrameInstructionsGeometryEditCommands& Commands = FC2DFrameInstructionsGeometryEditCommands::Get();
 
 	const TSharedRef<FSpriteGeometryEditMode> GeometryEditRef = GeometryEditMode.ToSharedRef();
 	
@@ -329,7 +329,7 @@ void FFlipbookDataEditorViewportClient::BindCommands()
 	return;
 }
 
-FBox FFlipbookDataEditorViewportClient::GetDesiredFocusBounds() const
+FBox FC2DFrameInstructionsEditorViewportClient::GetDesiredFocusBounds() const
 {
 	return AnimatedRenderComponent->Bounds.GetBox();
 }

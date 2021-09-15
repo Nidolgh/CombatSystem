@@ -8,10 +8,10 @@
 #include "SCommonEditorViewportToolbarBase.h"
 
 // In-viewport toolbar widget used in the sprite editor
-class SFlipbookDataEditorViewportToolbar : public SCommonEditorViewportToolbarBase
+class SC2DFrameInstructionsEditorViewportToolbar : public SCommonEditorViewportToolbarBase
 {
 public:
-	SLATE_BEGIN_ARGS(SFlipbookDataEditorViewportToolbar) {}
+	SLATE_BEGIN_ARGS(SC2DFrameInstructionsEditorViewportToolbar) {}
 	SLATE_END_ARGS()
 
 	void Construct(const FArguments& InArgs, TSharedPtr<class ICommonEditorViewportToolbarInfoProvider> InInfoProvider);

@@ -9,7 +9,7 @@
 #include "Widgets/SBoxPanel.h"
 #include "Widgets/Text/STextBlock.h"
 #include "Widgets/Layout/SBox.h"
-#include "Combat2DEditor/Classes/FlipbookData.h"
+#include "Combat2DEditor/Classes/C2DFrameInstructions.h"
 
 //////////////////////////////////////////////////////////////////////////
 // STimelineHeader
@@ -20,19 +20,19 @@ class STimelineHeader : public SCompoundWidget
 public:
 	SLATE_BEGIN_ARGS(STimelineHeader)
 		: _SlateUnitsPerFrame(1)
-		, _FlipbookDataBeingEdited(nullptr)
+		, _C2DFrameInstructionsBeingEdited(nullptr)
 		, _PlayTime(0)
 	{}
 
 	SLATE_ATTRIBUTE(float, SlateUnitsPerFrame)
-		SLATE_ATTRIBUTE(class UFlipbookData*, FlipbookDataBeingEdited)
+		SLATE_ATTRIBUTE(class UC2DFrameInstructions*, C2DFrameInstructionsBeingEdited)
 		SLATE_ATTRIBUTE(float, PlayTime)
 		SLATE_END_ARGS()
 
 		void Construct(const FArguments& InArgs)
 	{
 		SlateUnitsPerFrame = InArgs._SlateUnitsPerFrame;
-		FlipbookDataBeingEdited = InArgs._FlipbookDataBeingEdited;
+		C2DFrameInstructionsBeingEdited = InArgs._C2DFrameInstructionsBeingEdited;
 		PlayTime = InArgs._PlayTime;
 
 		NumFramesFromLastRebuild = 0;
@@ -49,7 +49,7 @@ public:
 	{
 		MainBoxPtr->ClearChildren();
 
-		UPaperFlipbook* Flipbook = FlipbookDataBeingEdited.Get()->TargetFlipbook;
+		UPaperFlipbook* Flipbook = C2DFrameInstructionsBeingEdited.Get()->TargetFlipbook;
 		const float LocalSlateUnitsPerFrame = SlateUnitsPerFrame.Get();
 		if ((Flipbook != nullptr) && (LocalSlateUnitsPerFrame > 0))
 		{
@@ -79,7 +79,7 @@ public:
 
 private:
 	TAttribute<float> SlateUnitsPerFrame;
-	TAttribute<class UFlipbookData*> FlipbookDataBeingEdited;
+	TAttribute<class UC2DFrameInstructions*> C2DFrameInstructionsBeingEdited;
 	TAttribute<float> PlayTime;
 
 	TSharedPtr<SHorizontalBox> MainBoxPtr;

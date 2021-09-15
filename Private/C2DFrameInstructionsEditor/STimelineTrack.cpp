@@ -14,13 +14,13 @@
 #include "AssetData.h"
 #include "Framework/Commands/GenericCommands.h"
 #include "Combat2DStyle.h"
-#include "FlipbookDataEditorCommands.h"
-#include "SFlipbookDataTrackHandle.h"
+#include "C2DFrameInstructionsEditorCommands.h"
+#include "SC2DFrameInstructionsTrackHandle.h"
 #include "DragAndDrop/AssetDragDropOp.h"
 #include "Editor.h"
 #include "PropertyCustomizationHelpers.h"
 #include "PaperSprite.h"
-#include "Combat2DEditor/Classes/FlipbookData.h"
+#include "Combat2DEditor/Classes/C2DFrameInstructions.h"
 #include "Subsystems/AssetEditorSubsystem.h"
 
 #define LOCTEXT_NAMESPACE "FlipbookEditor"
@@ -30,7 +30,7 @@
 
 TSharedRef<SWidget> SFlipbookKeyframeWidget::GenerateContextMenu()
 {
-	const FFlipbookDataEditorCommands& Commands = FFlipbookDataEditorCommands::Get();
+	const FC2DFrameInstructionsEditorCommands& Commands = FC2DFrameInstructionsEditorCommands::Get();
 
 	OnSelectionChanged.ExecuteIfBound(FrameIndex);
 
@@ -77,7 +77,7 @@ void SFlipbookKeyframeWidget::Construct(const FArguments& InArgs, int32 InFrameI
 {
 	FrameIndex = InFrameIndex;
 
-	const FFlipbookDataEditorCommands& Commands = FFlipbookDataEditorCommands::Get();
+	const FC2DFrameInstructionsEditorCommands& Commands = FC2DFrameInstructionsEditorCommands::Get();
 	CommandList = MakeShareable(new FUICommandList);
 	CommandList->Append(InCommandList.ToSharedRef());
 	CommandList->MapAction(Commands.ShowInContentBrowser, FExecuteAction::CreateSP(this, &SFlipbookKeyframeWidget::ShowInContentBrowser));
@@ -105,7 +105,7 @@ void SFlipbookKeyframeWidget::Construct(const FArguments& InArgs, int32 InFrameI
 		.WidthOverride(this, &SFlipbookKeyframeWidget::GetFrameWidth)
 		[
 			SNew(SBorder)
-			.BorderImage(FCombat2DStyle::Get()->GetBrush("FlipbookDataEditor.RegionBody"))
+			.BorderImage(FCombat2DStyle::Get()->GetBrush("C2DFrameInstructionsEditor.RegionBody"))
 		.BorderBackgroundColor_Static(BorderColorDelegate, FlipbookBeingEdited, FrameIndex)
 		.OnMouseButtonUp(this, &SFlipbookKeyframeWidget::KeyframeOnMouseButtonUp)
 		.ToolTipText(this, &SFlipbookKeyframeWidget::GetKeyframeTooltip)
@@ -447,7 +447,7 @@ void SFlipbookTimelineTrack::Construct(const FArguments& InArgs, TSharedPtr<FUIC
 {
 	CommandList = InCommandList;
 	SlateUnitsPerFrame = InArgs._SlateUnitsPerFrame;
-	FlipbookDataBeingEdited = InArgs._FlipbookDataBeingEdited;
+	C2DFrameInstructionsBeingEdited = InArgs._C2DFrameInstructionsBeingEdited;
 	OnSelectionChanged = InArgs._OnSelectionChanged;
 
 	ChildSlot
@@ -463,7 +463,7 @@ void SFlipbookTimelineTrack::Rebuild()
 	MainBoxPtr->ClearChildren();
 
 	// Create the sections for each keyframe
-	if (UPaperFlipbook* Flipbook = FlipbookDataBeingEdited.Get()->TargetFlipbook)
+	if (UPaperFlipbook* Flipbook = C2DFrameInstructionsBeingEdited.Get()->TargetFlipbook)
 	{
 		for (int32 KeyFrameIdx = 0; KeyFrameIdx < Flipbook->GetNumKeyFrames(); ++KeyFrameIdx)
 		{
@@ -472,7 +472,7 @@ void SFlipbookTimelineTrack::Rebuild()
 				[
 					SNew(SFlipbookKeyframeWidget, KeyFrameIdx, CommandList)
 					.SlateUnitsPerFrame(this->SlateUnitsPerFrame)
-				.FlipbookBeingEdited(this->FlipbookDataBeingEdited.Get()->TargetFlipbook)
+				.FlipbookBeingEdited(this->C2DFrameInstructionsBeingEdited.Get()->TargetFlipbook)
 				.OnSelectionChanged(this->OnSelectionChanged)
 				];
 		}

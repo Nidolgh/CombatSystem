@@ -1,11 +1,11 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
-#include "FlipbookDataEditorSettings.h"
+#include "C2DFrameInstructionsEditorSettings.h"
 
 //////////////////////////////////////////////////////////////////////////
-// UFlipbookDataEditorSettings
+// UC2DFrameInstructionsEditorSettings
 
-UFlipbookDataEditorSettings::UFlipbookDataEditorSettings()
+UC2DFrameInstructionsEditorSettings::UC2DFrameInstructionsEditorSettings()
 	: BackgroundColor(55, 55, 55)
 	, bShowGridByDefault(false)
 {

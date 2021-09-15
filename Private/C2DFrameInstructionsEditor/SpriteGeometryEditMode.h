@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 #include "InputCoreTypes.h"
 #include "EdMode.h"
-#include "Combat2DEditor/Classes/FlipbookData.h"
+#include "Combat2DEditor/Classes/C2DFrameInstructions.h"
 #include "SpriteGeometryEditing.h"
 
 class FCanvas;
@@ -51,7 +51,7 @@ public:
 	void SetGeometryColors(const FLinearColor& NewVertexColor, const FLinearColor& NewNegativeVertexColor);
 
 	// Changes the geometry being edited (clears the selection set in the process)
-	void SetKeyFrameInstructionsBeingEdited(TArray<FFlipbookDataKeyFrameInstruction>* NewKeyFrameInstructions, int32* NewInstructionToEdit, bool bInAllowCircles, bool bInAllowSubtractivePolygons);
+	void SetKeyFrameInstructionsBeingEdited(TArray<FC2DFrameInstructionsKeyFrameInstruction>* NewKeyFrameInstructions, int32* NewInstructionToEdit, bool bInAllowCircles, bool bInAllowSubtractivePolygons);
 
 	
 	void BindCommands(TSharedPtr<FUICommandList> InCommandList);
@@ -82,7 +82,7 @@ protected:
 	// Sprite geometry editing/rendering helper
 	FSpriteGeometryEditingHelper SpriteGeometryHelper;
 
-	TArray<FFlipbookDataKeyFrameInstruction>* KeyFrameInstructions;
+	TArray<FC2DFrameInstructionsKeyFrameInstruction>* KeyFrameInstructions;
 	int32* InstructionToEdit;
 	
 	// Marquee tracking

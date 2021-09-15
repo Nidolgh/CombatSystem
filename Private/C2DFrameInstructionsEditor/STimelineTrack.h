@@ -12,7 +12,7 @@
 #include "Widgets/SCompoundWidget.h"
 #include "Types/SlateStructs.h"
 #include "PaperFlipbook.h"
-#include "SFlipbookDataTimeline.h"
+#include "SC2DFrameInstructionsTimeline.h"
 #include "ScopedTransaction.h"
 
 class FUICommandList;
@@ -117,18 +117,18 @@ protected:
 };
 
 //////////////////////////////////////////////////////////////////////////
-// SFlipbookDataTimelineTrack
+// SC2DFrameInstructionsTimelineTrack
 
 class SFlipbookTimelineTrack : public SCompoundWidget
 {
 public:
 	SLATE_BEGIN_ARGS(SFlipbookTimelineTrack)
 		: _SlateUnitsPerFrame(1)
-		, _FlipbookDataBeingEdited(nullptr)
+		, _C2DFrameInstructionsBeingEdited(nullptr)
 	{}
 
 	SLATE_ATTRIBUTE( float, SlateUnitsPerFrame )
-		SLATE_ATTRIBUTE( class UFlipbookData*, FlipbookDataBeingEdited )
+		SLATE_ATTRIBUTE( class UC2DFrameInstructions*, C2DFrameInstructionsBeingEdited )
 		SLATE_EVENT( FOnFlipbookKeyframeSelectionChanged, OnSelectionChanged )
 
 		SLATE_END_ARGS()
@@ -139,7 +139,7 @@ public:
 
 private:
 	TAttribute<float> SlateUnitsPerFrame;
-	TAttribute< class UFlipbookData* > FlipbookDataBeingEdited;
+	TAttribute< class UC2DFrameInstructions* > C2DFrameInstructionsBeingEdited;
 
 	TSharedPtr<SHorizontalBox> MainBoxPtr;
 

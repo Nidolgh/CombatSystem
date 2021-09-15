@@ -20,15 +20,15 @@ class STimelineHeader;
 // Called when the selection changes
 DECLARE_DELEGATE_OneParam(FOnFlipbookKeyframeSelectionChanged, int32);
 
-class SFlipbookDataTimeline : public SCompoundWidget
+class SC2DFrameInstructionsTimeline : public SCompoundWidget
 {
 public:
-	SLATE_BEGIN_ARGS(SFlipbookDataTimeline)
-		: _FlipbookDataBeingEdited(nullptr)
+	SLATE_BEGIN_ARGS(SC2DFrameInstructionsTimeline)
+		: _C2DFrameInstructionsBeingEdited(nullptr)
 		, _PlayTime(0)
 	{}
 
-	SLATE_ATTRIBUTE(class UFlipbookData*, FlipbookDataBeingEdited)
+	SLATE_ATTRIBUTE(class UC2DFrameInstructions*, C2DFrameInstructionsBeingEdited)
 		SLATE_ATTRIBUTE(float, PlayTime)
 		SLATE_EVENT(FOnFlipbookKeyframeSelectionChanged, OnSelectionChanged)
 		SLATE_END_ARGS()
@@ -61,7 +61,7 @@ private:
 	TSharedPtr<class STimelineHeader> TimelineHeader;
 	TSharedPtr<class SFlipbookTimelineTrack> TimelineTrack;
 
-	TAttribute<class UFlipbookData*> FlipbookDataBeingEdited;
+	TAttribute<class UC2DFrameInstructions*> C2DFrameInstructionsBeingEdited;
 	TAttribute<float> PlayTime;
 	TSharedPtr<FUICommandList> CommandList;
 	FOnFlipbookKeyframeSelectionChanged OnSelectionChanged;

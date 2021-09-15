@@ -6,13 +6,13 @@
 #include "Framework/Commands/Commands.h"
 #include "Combat2DStyle.h"
 
-class FFlipbookDataEditorCommands : public TCommands<FFlipbookDataEditorCommands>
+class FC2DFrameInstructionsEditorCommands : public TCommands<FC2DFrameInstructionsEditorCommands>
 {
 public:
-	FFlipbookDataEditorCommands()
-		: TCommands<FFlipbookDataEditorCommands>(
-			TEXT("FlipbookDataEditor"), // Context name for fast lookup
-			NSLOCTEXT("Contexts", "FlipbookDataEditor", "FlipbookData Editor"), // Localized context name for displaying
+	FC2DFrameInstructionsEditorCommands()
+		: TCommands<FC2DFrameInstructionsEditorCommands>(
+			TEXT("C2DFrameInstructionsEditor"), // Context name for fast lookup
+			NSLOCTEXT("Contexts", "C2DFrameInstructionsEditor", "C2DFrameInstructions Editor"), // Localized context name for displaying
 			NAME_None, // Parent
 			FCombat2DStyle::Get()->GetStyleSetName() // Icon Style Set
 			)

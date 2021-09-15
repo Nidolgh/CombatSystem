@@ -2,18 +2,18 @@
 
 #include "CoreMinimal.h"
 #include "UObject/Object.h"
-#include "FlipbookDataEditorSettings.generated.h"
+#include "C2DFrameInstructionsEditorSettings.generated.h"
 
-// Settings for the FlipbookData editor
+// Settings for the C2DFrameInstructions editor
 UCLASS(config=EditorPerProjectUserSettings)
-class UFlipbookDataEditorSettings : public UObject
+class UC2DFrameInstructionsEditorSettings : public UObject
 {
 	GENERATED_BODY()
 
 public:
-	UFlipbookDataEditorSettings();
+	UC2DFrameInstructionsEditorSettings();
 
-	/** Background color in the FlipbookData editor */
+	/** Background color in the C2DFrameInstructions editor */
 	UPROPERTY(config, EditAnywhere, Category=Background, meta=(HideAlphaChannel))
 	FColor BackgroundColor;
 

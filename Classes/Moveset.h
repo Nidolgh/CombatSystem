@@ -1,7 +1,7 @@
 #include "CoreMinimal.h"
 #include "UObject/NoExportTypes.h"
 
-#include "FlipbookData.h"
+#include "C2DFrameInstructions.h"
 
 #include "Moveset.generated.h"
 
@@ -17,5 +17,5 @@ protected:
 		FString Description;
 
 	UPROPERTY(EditAnywhere, Category = Moveset)
-		TArray<UFlipbookData*> FlipbookDataArray;
+		TArray<UC2DFrameInstructions*> C2DFrameInstructionsArray;
 };

@@ -1,14 +1,14 @@
 // Copyright 1998-2018 Epic Games, Inc. All Rights Reserved.
 #include "Combat2DModule.h"
 
-#include "FlipbookDataEditor/FlipbookDataEditor.h"
+#include "C2DFrameInstructionsEditor/C2DFrameInstructionsEditor.h"
 #include "MovesetEditor/MovesetEditor.h"
 
 #include "Modules/ModuleManager.h"
 #include "Combat2DStyle.h"
 #include "AssetToolsModule.h"
 
-const FName FlipbookDataEditorAppIdentifier = FName(TEXT("FlipbookDataEditorApp"));
+const FName C2DFrameInstructionsEditorAppIdentifier = FName(TEXT("C2DFrameInstructionsEditorApp"));
 const FName MovesetEditorAppIdentifier = FName(TEXT("MovesetEditorApp"));
 
 #define LOCTEXT_NAMESPACE "FCombat2DEditorModule"
@@ -29,7 +29,7 @@ void FCombat2DModule::StartupModule()
 	ToolBarExtensibilityManager = MakeShareable(new FExtensibilityManager);
 
 	IAssetTools& AssetTools = FModuleManager::LoadModuleChecked<FAssetToolsModule>("AssetTools").Get();
-	RegisterAssetTypeAction(AssetTools, MakeShareable(new FAssetTypeActions_FlipbookData()));
+	RegisterAssetTypeAction(AssetTools, MakeShareable(new FAssetTypeActions_C2DFrameInstructions()));
 	RegisterAssetTypeAction(AssetTools, MakeShareable(new FAssetTypeActions_Moveset()));
 
 	AssetGategoryType = AssetTools.RegisterAdvancedAssetCategory("Combat2DAssets", FText::FromString("Combat2DAssets"));
@@ -57,11 +57,11 @@ void FCombat2DModule::ShutdownModule()
 	CreatedAssetTypeActions.Empty();
 }
 
-TSharedRef<IFlipbookDataEditor> FCombat2DModule::CreateFlipbookDataEditor(const EToolkitMode::Type Mode, const TSharedPtr< IToolkitHost >& InitToolkitHost, UFlipbookData* FlipbookData)
+TSharedRef<IC2DFrameInstructionsEditor> FCombat2DModule::CreateC2DFrameInstructionsEditor(const EToolkitMode::Type Mode, const TSharedPtr< IToolkitHost >& InitToolkitHost, UC2DFrameInstructions* C2DFrameInstructions)
 {
-	TSharedRef<FFlipbookDataEditor> NewFlipbookDataEditor(new FFlipbookDataEditor());
-	NewFlipbookDataEditor->InitFlipbookDataEditor(Mode, InitToolkitHost, FlipbookData);
-	return NewFlipbookDataEditor;
+	TSharedRef<FC2DFrameInstructionsEditor> NewC2DFrameInstructionsEditor(new FC2DFrameInstructionsEditor());
+	NewC2DFrameInstructionsEditor->InitC2DFrameInstructionsEditor(Mode, InitToolkitHost, C2DFrameInstructions);
+	return NewC2DFrameInstructionsEditor;
 }
 
 TSharedRef<IMovesetEditor> FCombat2DModule::CreateMovesetEditor(const EToolkitMode::Type Mode, const TSharedPtr< IToolkitHost >& InitToolkitHost, UMoveset* Moveset)

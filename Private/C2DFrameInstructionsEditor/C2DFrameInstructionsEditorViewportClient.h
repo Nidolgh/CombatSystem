@@ -6,14 +6,14 @@
 #include "InputCoreTypes.h"
 #include "PreviewScene.h"
 #include "AssetData.h"
-#include "FlipbookDataEditor.h"
+#include "C2DFrameInstructionsEditor.h"
 #include "SEditorViewport.h"
-#include "FlipbookDataEditorViewportClient.h"
+#include "C2DFrameInstructionsEditorViewportClient.h"
 
 #include "SpriteGeometryEditMode.h"
 
 #include "SpriteEditorSelections.h"
-#include "Combat2DEditor/Classes/FlipbookData.h"
+#include "Combat2DEditor/Classes/C2DFrameInstructions.h"
 
 class UPaperFlipbookComponent;
 class FCanvas;
@@ -28,11 +28,11 @@ struct FViewportSelectionRectangle
 //////////////////////////////////////////////////////////////////////////
 // FSpriteEditorViewportClient
 
-class FFlipbookDataEditorViewportClient : public FEditorViewportClient, public ISpriteSelectionContext
+class FC2DFrameInstructionsEditorViewportClient : public FEditorViewportClient, public ISpriteSelectionContext
 {
 public:
 	/** Constructor */
-	FFlipbookDataEditorViewportClient(TWeakPtr<FFlipbookDataEditor> InFlipbookDataEditor, TWeakPtr<class SEditorViewport> InFlipbookDataEditorViewportPtr);
+	FC2DFrameInstructionsEditorViewportClient(TWeakPtr<FC2DFrameInstructionsEditor> InC2DFrameInstructionsEditor, TWeakPtr<class SEditorViewport> InC2DFrameInstructionsEditorViewportPtr);
 
 	// FViewportClient interface
 	virtual void Draw(const FSceneView* View, FPrimitiveDrawInterface* PDI) override;
@@ -74,7 +74,7 @@ public:
 	}
 
 	UPaperSprite* GetSpriteOnCurrentFrame() const;
-	FFlipbookDataKeyFrame* GetKeyFrameDataOnCurrentFrame() const;
+	FC2DFrameInstructionsKeyFrame* GetKeyFrameDataOnCurrentFrame() const;
 	
 	UPaperFlipbookComponent* GetPreviewComponent() const;
 
@@ -97,7 +97,7 @@ private:
 	FPreviewScene OwnedPreviewScene;
 
 	// Sprite editor that owns this viewport
-	TWeakPtr<FFlipbookDataEditor> FlipbookDataEditorPtr;
+	TWeakPtr<FC2DFrameInstructionsEditor> C2DFrameInstructionsEditorPtr;
 
 	// Render component for the sprite being edited
 	TWeakObjectPtr<UPaperFlipbookComponent> AnimatedRenderComponent;
@@ -113,7 +113,7 @@ private:
 	bool bDeferZoomToSpriteIsInstant;
 
 	// The flipbook being displayed in this client
-	TAttribute<class UFlipbookData*> FlipbookDataBeingEdited;
+	TAttribute<class UC2DFrameInstructions*> C2DFrameInstructionsBeingEdited;
 
 	// A cached pointer to the flipbook that was being edited last frame. Used for invalidation reasons.
 	TWeakObjectPtr<class UPaperFlipbook> FlipbookBeingEditedLastFrame;
@@ -125,6 +125,6 @@ private:
 	// Did we dirty something during manipulation?
 	bool bManipulationDirtiedSomething;
 
-	FFlipbookDataKeyFrame* CurrentKeyFrameData = nullptr;
-	FFlipbookDataKeyFrame* LastKeyFrameData = nullptr;
+	FC2DFrameInstructionsKeyFrame* CurrentKeyFrameData = nullptr;
+	FC2DFrameInstructionsKeyFrame* LastKeyFrameData = nullptr;
 };

@@ -6,7 +6,7 @@
 #include "SpriteEditorOnlyTypes.h"
 
 #include "PaperFlipbook.h"
-#include "FlipbookData.generated.h"
+#include "C2DFrameInstructions.generated.h"
 
 // https://answers.unrealengine.com/questions/25049/what-does-coreuobject-api-macro.html
 
@@ -19,11 +19,9 @@ enum class InstructionType
 };
 
 USTRUCT()
-struct FFlipbookDataKeyFrameInstruction
+struct FC2DFrameInstructionsKeyFrameInstruction
 {
 	GENERATED_USTRUCT_BODY()
-
-	
 	
 	UPROPERTY(EditAnywhere, Category=FrameInstruction, meta=(ClampMin=1))
 	float Damage;
@@ -53,27 +51,27 @@ struct FFlipbookDataKeyFrameInstruction
 };
 
 USTRUCT()
-struct FFlipbookDataKeyFrame
+struct FC2DFrameInstructionsKeyFrame
 {
 	GENERATED_USTRUCT_BODY()
 
-	UPROPERTY(EditAnywhere, Category = FlipbookData)
-		TArray<FFlipbookDataKeyFrameInstruction> KeyFrameInstructions;
+	UPROPERTY(EditAnywhere, Category = C2DFrameInstructions)
+		TArray<FC2DFrameInstructionsKeyFrameInstruction> KeyFrameInstructions;
 };
 
 UCLASS()
-class COMBAT2DEDITOR_API UFlipbookData : public UObject
+class COMBAT2DEDITOR_API UC2DFrameInstructions : public UObject
 {
 	GENERATED_BODY()
 
 public:
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = FlipbookData)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = C2DFrameInstructions)
 	UPaperFlipbook* TargetFlipbook;
 
-	UPROPERTY(EditAnywhere, Category = FlipbookData)
+	UPROPERTY(EditAnywhere, Category = C2DFrameInstructions)
 		FString Description;
 	
-	UPROPERTY(EditAnywhere, Category = FlipbookData)
-	TArray<FFlipbookDataKeyFrame> KeyFrameArray;
+	UPROPERTY(EditAnywhere, Category = C2DFrameInstructions)
+	TArray<FC2DFrameInstructionsKeyFrame> KeyFrameArray;
 };

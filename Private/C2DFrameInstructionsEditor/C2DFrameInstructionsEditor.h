@@ -2,23 +2,23 @@
 
 #include "CoreMinimal.h"
 
-#include "Combat2DEditor/Classes/FlipbookData.h"
+#include "Combat2DEditor/Classes/C2DFrameInstructions.h"
 
 #include "ITransportControl.h"
 #include "PaperFlipbookComponent.h"
 #include "Toolkits/IToolkitHost.h"
 #include "Toolkits/AssetEditorToolkit.h"
 
-class SFlipbookDataEditorViewport;
+class SC2DFrameInstructionsEditorViewport;
 class IDetailsView;
 class SDockableTab;
-class UFlipbookData;
+class UC2DFrameInstructions;
 class SGeometryPropertiesTabBody;
 
 //////////////////////////////////////////////////////////////////////////
 // 
 
-namespace EFlipbookDataEditorMode
+namespace EC2DFrameInstructionsEditorMode
 {
 	enum Type
 	{
@@ -31,18 +31,18 @@ namespace EFlipbookDataEditorMode
 
 //////////////////////////////////////////////////////////////////////////
 
-class IFlipbookDataEditor : public FAssetEditorToolkit {
+class IC2DFrameInstructionsEditor : public FAssetEditorToolkit {
 	
 public:
 	
-	virtual UFlipbookData* GetFlipbookDataBeingEdited() = 0;
+	virtual UC2DFrameInstructions* GetC2DFrameInstructionsBeingEdited() = 0;
 
 };
 
 /**
  * 
  */
-class COMBAT2DEDITOR_API FFlipbookDataEditor : public IFlipbookDataEditor
+class COMBAT2DEDITOR_API FC2DFrameInstructionsEditor : public IC2DFrameInstructionsEditor
 {
 public:
 
@@ -54,12 +54,12 @@ public:
 	 *
 	 * @param	Mode					Asset editing mode for this editor (standalone or world-centric)
 	 * @param	InitToolkitHost			When Mode is WorldCentric, this is the level editor instance to spawn this editor within
-	 * @param	InFlipbookData			The Custom Asset to Edit
+	 * @param	InC2DFrameInstructions			The Custom Asset to Edit
 	 */
-	void InitFlipbookDataEditor(const EToolkitMode::Type Mode, const TSharedPtr<class IToolkitHost>& InitToolkitHost, UFlipbookData* InFlipbookData);
+	void InitC2DFrameInstructionsEditor(const EToolkitMode::Type Mode, const TSharedPtr<class IToolkitHost>& InitToolkitHost, UC2DFrameInstructions* InC2DFrameInstructions);
 
 	/** Destructor */
-	virtual ~FFlipbookDataEditor();
+	virtual ~FC2DFrameInstructionsEditor();
 
 	UPaperFlipbookComponent* GetPreviewComponent() const;
 
@@ -72,9 +72,9 @@ public:
 	virtual bool IsPrimaryEditor() const override { return true; }
 	/** End IToolkit interface */
 
-	/** Begin IFlipbookDataEditor interface */
-	virtual UFlipbookData* GetFlipbookDataBeingEdited();
-	/** End IFlipbookDataEditor interface */
+	/** Begin IC2DFrameInstructionsEditor interface */
+	virtual UC2DFrameInstructions* GetC2DFrameInstructionsBeingEdited();
+	/** End IC2DFrameInstructionsEditor interface */
 
         UPaperFlipbook* GetFlipbookBeingEdited() const;
 	
@@ -85,7 +85,7 @@ public:
 
 	SGeometryPropertiesTabBody* GetGeoPropTabBody() const { return GeometryPropertiesTabBody.Get(); }
 
-	FFlipbookDataKeyFrame* CreateKeyFrameDataOnCurrentFrame();
+	FC2DFrameInstructionsKeyFrame* CreateKeyFrameDataOnCurrentFrame();
 	void CreateKeyFrameInstructionOnCurrentFrame();
 
 protected:
@@ -158,8 +158,8 @@ private:
 	TSharedPtr<class IDetailsView> DetailsView;
 
 	/** The Custom Asset open within this editor */
-	UFlipbookData* FlipbookDataBeingEdited = nullptr;
-	TSharedPtr<SFlipbookDataEditorViewport> ViewportPtr;
+	UC2DFrameInstructions* C2DFrameInstructionsBeingEdited = nullptr;
+	TSharedPtr<SC2DFrameInstructionsEditorViewport> ViewportPtr;
 
 	TSharedPtr<SGeometryPropertiesTabBody> GeometryPropertiesTabBody;
 };
@@ -176,9 +176,9 @@ public:
 	SLATE_END_ARGS()
 
 		void Construct(const FArguments &InArgs, 
-			TSharedPtr<FFlipbookDataEditor> InFlipbookEditor)
+			TSharedPtr<FC2DFrameInstructionsEditor> InFlipbookEditor)
 	{
-		FlipbookDataEditorPtr = InFlipbookEditor;
+		C2DFrameInstructionsEditorPtr = InFlipbookEditor;
 
 		ChildSlot
 			[
@@ -190,20 +190,20 @@ public:
 
 	void Rebuild()
 	{
-		UFlipbookData* FlipbookData = FlipbookDataEditorPtr.Pin()->GetFlipbookDataBeingEdited();
-		if (FlipbookData->KeyFrameArray.Num() == 0)
+		UC2DFrameInstructions* C2DFrameInstructions = C2DFrameInstructionsEditorPtr.Pin()->GetC2DFrameInstructionsBeingEdited();
+		if (C2DFrameInstructions->KeyFrameArray.Num() == 0)
 		{
 			return;
 		}
 		
-		KFArray = &FlipbookData->KeyFrameArray[FlipbookDataEditorPtr.Pin()->GetCurrentFrame()].KeyFrameInstructions;
+		KFArray = &C2DFrameInstructions->KeyFrameArray[C2DFrameInstructionsEditorPtr.Pin()->GetCurrentFrame()].KeyFrameInstructions;
 
 		MainBoxPtr->ClearChildren();
 		//HorizontalButtonsPtr->ClearChildren();
 
 		FString HeaderBase = TEXT("Active instruction frame");
 		HeaderBase.Append("_");
-		HeaderBase.Append(FString::FromInt(FlipbookDataEditorPtr.Pin()->GetCurrentFrame()));
+		HeaderBase.Append(FString::FromInt(C2DFrameInstructionsEditorPtr.Pin()->GetCurrentFrame()));
 		HeaderBase.Append("-");
 		HeaderBase.Append(FString::FromInt(ButtonFrameInstructionID));
 
@@ -225,7 +225,7 @@ public:
 				.Text(FText::FromString(TEXT("Add Instruction")))
 				.OnClicked_Lambda([this]()
 					{
-						FlipbookDataEditorPtr.Pin().Get()->CreateKeyFrameInstructionOnCurrentFrame();
+						C2DFrameInstructionsEditorPtr.Pin().Get()->CreateKeyFrameInstructionOnCurrentFrame();
 
 						return FReply::Handled();
 					})
@@ -329,23 +329,23 @@ public:
 	// SWidget interface
 	virtual void Tick(const FGeometry& AllottedGeometry, const double InCurrentTime, const float InDeltaTime) override
 	{
-		// check for rebuild FlipbookDataEditorPtr.Pin()->GetCurrentFrame()
+		// check for rebuild C2DFrameInstructionsEditorPtr.Pin()->GetCurrentFrame()
 		if ( KFArray != nullptr
 			&& (( LastInstructionNum != KFArray->Num() ) 
-			|| ( LastFrame != FlipbookDataEditorPtr.Pin()->GetCurrentFrame() )
+			|| ( LastFrame != C2DFrameInstructionsEditorPtr.Pin()->GetCurrentFrame() )
 			|| ( LastButtonFrameInstructionID != ButtonFrameInstructionID ) )
 			) 
 		{
-			LastButtonFrameInstructionID = ( LastFrame == FlipbookDataEditorPtr.Pin()->GetCurrentFrame() ) ? ButtonFrameInstructionID : 0;
+			LastButtonFrameInstructionID = ( LastFrame == C2DFrameInstructionsEditorPtr.Pin()->GetCurrentFrame() ) ? ButtonFrameInstructionID : 0;
 
 			LastInstructionNum = KFArray->Num();
-			LastFrame = FlipbookDataEditorPtr.Pin()->GetCurrentFrame();
+			LastFrame = C2DFrameInstructionsEditorPtr.Pin()->GetCurrentFrame();
 
 			Rebuild();
 		}
-		else if (KFArray == nullptr)
+		else if (KFArray == nullptr && C2DFrameInstructionsEditorPtr.Pin()->GetC2DFrameInstructionsBeingEdited()->KeyFrameArray.Num() > 0)
 		{
-			KFArray = &FlipbookDataEditorPtr.Pin()->GetFlipbookDataBeingEdited()->KeyFrameArray[FlipbookDataEditorPtr.Pin()->GetCurrentFrame()].KeyFrameInstructions;
+			KFArray = &C2DFrameInstructionsEditorPtr.Pin()->GetC2DFrameInstructionsBeingEdited()->KeyFrameArray[C2DFrameInstructionsEditorPtr.Pin()->GetCurrentFrame()].KeyFrameInstructions;
 		}
 	}
 	// End of SWidget interface
@@ -357,8 +357,8 @@ public:
 
 private:
 	// Pointer back to owning sprite editor instance (the keeper of state)
-	TWeakPtr<class FFlipbookDataEditor> FlipbookDataEditorPtr;
-	TArray<FFlipbookDataKeyFrameInstruction>* KFArray;
+	TWeakPtr<class FC2DFrameInstructionsEditor> C2DFrameInstructionsEditorPtr;
+	TArray<FC2DFrameInstructionsKeyFrameInstruction>* KFArray;
 	int32 LastInstructionNum = 0;
 	int32 LastFrame = 0;
 

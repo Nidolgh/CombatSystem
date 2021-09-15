@@ -8,16 +8,16 @@
 
 #include "IAssetTools.h"
 
-#include "Combat2DEditor/Classes/AssetTypeActions_FlipbookData.h"
+#include "Combat2DEditor/Classes/AssetTypeActions_C2DFrameInstructions.h"
 #include "Combat2DEditor/Classes/AssetTypeActions_Moveset.h"
 
-class IFlipbookDataEditor;
-class UFlipbookData;
+class IC2DFrameInstructionsEditor;
+class UC2DFrameInstructions;
 
 class IMovesetEditor;
 class UMoveset;
 
-extern const FName FlipbookDataEditorAppIdentifier;
+extern const FName C2DFrameInstructionsEditorAppIdentifier;
 extern const FName MovesetEditorAppIdentifier;
 
 /**
@@ -29,7 +29,7 @@ public:
 	/**
 	 * Creates a new custom asset editor.
 	 */
-	virtual TSharedRef<IFlipbookDataEditor> CreateFlipbookDataEditor(const EToolkitMode::Type Mode, const TSharedPtr< IToolkitHost >& InitToolkitHost, UFlipbookData* FlipbookData) = 0;
+	virtual TSharedRef<IC2DFrameInstructionsEditor> CreateC2DFrameInstructionsEditor(const EToolkitMode::Type Mode, const TSharedPtr< IToolkitHost >& InitToolkitHost, UC2DFrameInstructions* C2DFrameInstructions) = 0;
 	virtual TSharedRef<IMovesetEditor> CreateMovesetEditor(const EToolkitMode::Type Mode, const TSharedPtr< IToolkitHost >& InitToolkitHost, UMoveset* Moveset) = 0;
 
 	virtual EAssetTypeCategories::Type GetAssetCategoryType() const = 0;
@@ -54,7 +54,7 @@ public:
 	*/
 	virtual void ShutdownModule() override;
 
-	virtual TSharedRef<IFlipbookDataEditor> CreateFlipbookDataEditor(const EToolkitMode::Type Mode, const TSharedPtr< IToolkitHost >& InitToolkitHost, UFlipbookData* FlipbookData) override;
+	virtual TSharedRef<IC2DFrameInstructionsEditor> CreateC2DFrameInstructionsEditor(const EToolkitMode::Type Mode, const TSharedPtr< IToolkitHost >& InitToolkitHost, UC2DFrameInstructions* C2DFrameInstructions) override;
 
 	virtual TSharedRef<IMovesetEditor> CreateMovesetEditor(const EToolkitMode::Type Mode, const TSharedPtr< IToolkitHost >& InitToolkitHost, UMoveset* Moveset) override;
 
