@@ -1,1 +1,1 @@
-# Combat2DEditor
+# Combat2DPlugin
