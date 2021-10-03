@@ -34,7 +34,7 @@ public:
 	// End of ICommonEditorViewportToolbarInfoProvider interface
 
 	void ShowExtractSpritesDialog();
-
+	
 	UPaperFlipbookComponent* GetPreviewComponent() const;
 
 private:

@@ -81,7 +81,6 @@ FCombatFlipbookEditorViewportClient::FCombatFlipbookEditorViewportClient(TWeakPt
 
 	bShowPivot = true;
 
-	//DrawHelper.bDrawGrid = GetDefault<UCombatFlipbookEditorSettings>()->bShowGridByDefault;
 	DrawHelper.bDrawGrid = 0;
 
 	EngineShowFlags.DisableAdvancedFeatures();
@@ -96,8 +95,12 @@ FCombatFlipbookEditorViewportClient::FCombatFlipbookEditorViewportClient(TWeakPt
 	GeometryEditMode = MakeShareable(new FSpriteGeometryEditMode());
 
 	// Geometry edit mode
+	ModeTools->SetDefaultMode(FSpriteGeometryEditMode::EM_SpriteGeometry);
 	GeometryEditMode->SetModeTools(GetModeTools());
 	GeometryEditMode->SetEditorContext(this);
+	ModeTools->ActivateDefaultMode();
+
+	ModeTools->SetWidgetMode(FWidget::WM_Translate);
 
 	GeometryEditMode->SetGeometryColors(
 		FLinearColor(1.f, 1.f, 1.f, 1.f), 
@@ -179,7 +182,32 @@ void FCombatFlipbookEditorViewportClient::Tick(float DeltaSeconds)
 			FlipbookBeingEditedLastFrame = Flipbook;
 		}
 	}
+	
+	if (FSpriteGeometryCollection* GeometryCollectionInstruction = &CurrentKeyFrameData->CollisionDataArray[1].CollisionGeometry)
+	{
+		// Reposition the sprite (to be at the correct relative location to it's parent, undoing the pivot behavior)
+		/*const FVector2D PivotInTextureSpace = Sprite->ConvertPivotSpaceToTextureSpace(FVector2D::ZeroVector);
+		const FVector PivotInWorldSpace = TextureSpaceToWorldSpace(PivotInTextureSpace);
+		AnimatedRenderComponent->SetRelativeLocation(PivotInWorldSpace);*/
 
+		//bool bRenderTextureViewComponentVisibility = !IsInSourceRegionEditMode();
+		//if (bRenderTextureViewComponentVisibility != AnimatedRenderComponent->IsVisible())
+		//{
+		//	RequestFocusOnSelection(/*bInstant=*/ true);
+		//	AnimatedRenderComponent->SetVisibility(bRenderTextureViewComponentVisibility);
+		//}
+		if (GeometryCollectionInstruction->Shapes.IsValidIndex(0))
+		{
+			const FVector2D BoxSize(GeometryCollectionInstruction->Shapes[0].BoxSize);
+			const FVector2D BoxLocation(GeometryCollectionInstruction->Shapes[0].BoxPosition);
+			FBox2D SpriteBounds(ForceInitToZero);
+			SpriteBounds.Min = BoxLocation;
+			SpriteBounds.Max = BoxLocation + BoxSize;
+
+			GeometryEditMode->SetNewGeometryPreferredBounds(SpriteBounds);
+		}
+	}
+	
 	{
 		// Zoom in on the sprite
 		//@TODO: Fix this properly so it doesn't need to be deferred, or wait for the viewport to initialize
@@ -197,9 +225,10 @@ void FCombatFlipbookEditorViewportClient::Tick(float DeltaSeconds)
 			bDeferZoomToSprite = false;
 		}
 
-		FEditorViewportClient::Tick(DeltaSeconds);
 	}
 
+	FEditorViewportClient::Tick(DeltaSeconds);
+	
 	if (!GIntraFrameDebuggingGameThread)
 	{
 		OwnedPreviewScene.GetWorld()->Tick(LEVELTICK_All, DeltaSeconds);

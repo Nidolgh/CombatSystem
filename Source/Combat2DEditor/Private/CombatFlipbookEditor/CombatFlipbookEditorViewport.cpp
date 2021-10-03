@@ -16,7 +16,7 @@ void SCombatFlipbookEditorViewport::Construct(const FArguments& InArgs,
                                         TSharedPtr<FCombatFlipbookEditor> InCombatFlipbookEditor)
 {
 	CombatFlipbookEditorPtr = InCombatFlipbookEditor;
-
+	
 	SEditorViewport::Construct(SEditorViewport::FArguments());
 }
 
@@ -59,7 +59,6 @@ void SCombatFlipbookEditorViewport::BindCommands()
 		FCanExecuteAction(),
 		FIsActionChecked::CreateSP(EditorViewportClientRef,
 			&FCombatFlipbookEditorViewportClient::IsShowPivotChecked));
-
 
 	const FSpriteGeometryEditCommands& Commands2 = FSpriteGeometryEditCommands::Get();
 	const TSharedRef<FSpriteGeometryEditMode> GeometryEditRef = EditorViewportClientRef.Get().GeometryEditMode.

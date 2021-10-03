@@ -14,8 +14,6 @@
 #include "Utils.h"
 #include "PhysicsEngine/BodySetup.h"
 
-
-
 #define LOCTEXT_NAMESPACE "PaperGeometryEditing"
 
 //////////////////////////////////////////////////////////////////////////
@@ -409,13 +407,13 @@ void FSpriteGeometryEditMode::BindCommands(TSharedPtr<FUICommandList> CommandLis
 		FExecuteAction::CreateSP(this, &FSpriteGeometryEditMode::AddCircleShape),
 		FCanExecuteAction::CreateRaw(&SpriteGeometryHelper, &FSpriteGeometryEditingHelper::CanAddCircleShape),
 		FIsActionChecked(),
-		FIsActionButtonVisible::CreateRaw(&SpriteGeometryHelper, &FSpriteGeometryEditingHelper::CanAddCircleShape));
+		FIsActionButtonVisible::CreateRaw(&SpriteGeometryHelper, &FSpriteGeometryEditingHelper::CanAddCircleShape));*/
 	CommandList->MapAction(
 		Commands.SnapAllVertices,
 		FExecuteAction::CreateRaw(&SpriteGeometryHelper, &FSpriteGeometryEditingHelper::SnapAllVerticesToPixelGrid),
 		FCanExecuteAction::CreateRaw(&SpriteGeometryHelper, &FSpriteGeometryEditingHelper::CanSnapVerticesToPixelGrid),
 		FIsActionChecked(),
-		FIsActionButtonVisible::CreateRaw(&SpriteGeometryHelper, &FSpriteGeometryEditingHelper::CanSnapVerticesToPixelGrid));*/
+		FIsActionButtonVisible::CreateRaw(&SpriteGeometryHelper, &FSpriteGeometryEditingHelper::CanSnapVerticesToPixelGrid));
 }
 
 

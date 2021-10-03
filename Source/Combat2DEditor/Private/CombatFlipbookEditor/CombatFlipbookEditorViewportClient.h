@@ -74,7 +74,7 @@ public:
 
 	UPaperSprite* GetSpriteOnCurrentFrame() const;
 	FCombatFrames* GetCombatFrameDataOnCurrentFrame() const;
-
+	
 	UPaperFlipbookComponent* GetPreviewComponent() const;
 
 	// List of selection rectangles to draw
@@ -103,9 +103,6 @@ private:
 
 	// Should we show the sprite pivot?
 	bool bShowPivot;
-
-	// Should we show sockets?
-	bool bShowSockets;
 
 	// Should we zoom to the focus bounds next tick?
 	bool bDeferZoomToSprite;
