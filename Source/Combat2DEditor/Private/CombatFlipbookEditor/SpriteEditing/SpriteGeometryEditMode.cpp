@@ -49,7 +49,7 @@ void FSpriteGeometryEditMode::Initialize()
 void FSpriteGeometryEditMode::DrawHUD(FEditorViewportClient* ViewportClient, FViewport* Viewport, const FSceneView* View, FCanvas* Canvas)
 {
 	FEdMode::DrawHUD(ViewportClient, Viewport, View, Canvas);
-
+	
 	if (InstructionToEdit != nullptr && KeyFrameInstructions->IsValidIndex(*InstructionToEdit))
 	{
 		for (size_t i = 0; i < KeyFrameInstructions->Num(); i++)
