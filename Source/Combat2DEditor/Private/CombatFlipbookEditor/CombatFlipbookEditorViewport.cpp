@@ -173,4 +173,9 @@ SCombatFlipbookEditorViewport::GetPreviewComponent() const
 	return EditorViewportClient->GetPreviewComponent();
 }
 
+void SCombatFlipbookEditorViewport::ActivateEditMode()
+{
+	EditorViewportClient->ActivateEditMode();
+}
+
 //////////////////////////////////////////////////////////////////////////

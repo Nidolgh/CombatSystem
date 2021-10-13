@@ -56,6 +56,7 @@ namespace SpriteEditingConstants
 FCombatFlipbookEditorViewportClient::FCombatFlipbookEditorViewportClient(TWeakPtr<FCombatFlipbookEditor> InSpriteEditor, TWeakPtr<class SEditorViewport> InCombatFlipbookEditorViewportPtr)
 	:
 	FEditorViewportClient(new FAssetEditorModeManager(), nullptr, InCombatFlipbookEditorViewportPtr)
+	, bManipulating(false)
 	, CombatFlipbookEditorPtr(InSpriteEditor)
 {
 	check(CombatFlipbookEditorPtr.IsValid());
@@ -92,16 +93,10 @@ FCombatFlipbookEditorViewportClient::FCombatFlipbookEditorViewportClient(TWeakPt
 	const ELevelViewportType NewViewportType = LVT_OrthoXZ;
 	SetViewportType(NewViewportType);
 
+	//setup the geometry edit mode
 	GeometryEditMode = MakeShareable(new FSpriteGeometryEditMode());
-
-	// Geometry edit mode
-	ModeTools->SetDefaultMode(FSpriteGeometryEditMode::EM_SpriteGeometry);
-	GeometryEditMode->SetModeTools(GetModeTools());
 	GeometryEditMode->SetEditorContext(this);
-	ModeTools->ActivateDefaultMode();
-
-	ModeTools->SetWidgetMode(FWidget::WM_Translate);
-
+	GeometryEditMode->SetModeTools(GetModeTools());
 	GeometryEditMode->SetGeometryColors(
 		FLinearColor(1.f, 1.f, 1.f, 1.f), 
 		FLinearColor(1.f, 0.f, 1.f, 1.f));
@@ -262,6 +257,32 @@ FLinearColor FCombatFlipbookEditorViewportClient::GetBackgroundColor() const
 	return GetDefault<UCombatFlipbookEditorSettings>()->BackgroundColor;
 }
 
+void FCombatFlipbookEditorViewportClient::TrackingStarted(const FInputEventState& InInputState, bool bIsDraggingWidget, bool bNudge)
+{
+	//@TODO: Should push this into FEditorViewportClient
+	// Begin transacting.  Give the current editor mode an opportunity to do the transacting.
+	const bool bTrackingHandledExternally = ModeTools->StartTracking(this, Viewport);
+
+	if (!bManipulating && bIsDraggingWidget && !bTrackingHandledExternally)
+	{
+		BeginTransaction(LOCTEXT("ModificationInViewportTransaction", "Modification in Viewport"));
+		bManipulating = true;
+		bManipulationDirtiedSomething = false;
+	}
+}
+
+void FCombatFlipbookEditorViewportClient::TrackingStopped()
+{
+	// Stop transacting.  Give the current editor mode an opportunity to do the transacting.
+	const bool bTransactingHandledByEditorMode = ModeTools->EndTracking(this, Viewport);
+
+	if (bManipulating && !bTransactingHandledByEditorMode)
+	{
+		EndTransaction();
+		bManipulating = false;
+	}
+}
+
 FVector2D FCombatFlipbookEditorViewportClient::SelectedItemConvertWorldSpaceDeltaToLocalSpace(const FVector& WorldSpaceDelta) const
 {
 	UPaperSprite* Sprite = GetSpriteOnCurrentFrame();
@@ -319,6 +340,17 @@ void FCombatFlipbookEditorViewportClient::EndTransaction()
 void FCombatFlipbookEditorViewportClient::InvalidateViewportAndHitProxies()
 {
 	Viewport->Invalidate();
+}
+
+void FCombatFlipbookEditorViewportClient::ActivateEditMode()
+{
+	// Activate the sprite geometry edit mode
+	ModeTools->SetToolkitHost(CombatFlipbookEditorPtr.Pin()->GetToolkitHost());
+	ModeTools->SetDefaultMode(FSpriteGeometryEditMode::EM_SpriteGeometry);
+	ModeTools->ActivateDefaultMode();
+
+	// GeometryEditMode->BindCommands(.Pin()->GetCommandList());
+	ModeTools->SetWidgetMode(FWidget::WM_Translate);
 }
 
 void FCombatFlipbookEditorViewportClient::RequestFocusOnSelection(bool bInstant)

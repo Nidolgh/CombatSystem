@@ -37,6 +37,8 @@ public:
 	
 	UPaperFlipbookComponent* GetPreviewComponent() const;
 
+	void ActivateEditMode();
+	
 private:
 	// Pointer back to owning C2DFrameInstructions editor instance (the keeper of state)
 	TWeakPtr<FCombatFlipbookEditor> CombatFlipbookEditorPtr;

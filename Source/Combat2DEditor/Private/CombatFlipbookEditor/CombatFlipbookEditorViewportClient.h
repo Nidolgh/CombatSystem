@@ -33,7 +33,7 @@ class FCombatFlipbookEditorViewportClient : public FEditorViewportClient, public
 public:
 	/** Constructor */
 	FCombatFlipbookEditorViewportClient(TWeakPtr<FCombatFlipbookEditor> InCombatFlipbookEditor, TWeakPtr<class SEditorViewport> InCombatFlipbookEditorViewportPtr);
-
+	
 	// FViewportClient interface
 	virtual void Draw(const FSceneView* View, FPrimitiveDrawInterface* PDI) override;
 	virtual void DrawCanvas(FViewport& InViewport, FSceneView& View, FCanvas& Canvas) override;
@@ -44,8 +44,10 @@ public:
 	virtual void ProcessClick(FSceneView& View, HHitProxy* HitProxy, FKey Key, EInputEvent Event, uint32 HitX, uint32 HitY) override;
 	virtual bool InputKey(FViewport* Viewport, int32 ControllerId, FKey Key, EInputEvent Event, float AmountDepressed, bool bGamepad) override;
 	virtual FLinearColor GetBackgroundColor() const override;
+	virtual void TrackingStarted(const FInputEventState& InInputState, bool bIsDraggingWidget, bool bNudge) override;
+	virtual void TrackingStopped() override;
 	// End of FEditorViewportClient interface
-	// 
+	
 	// ISpriteSelectionContext interface
 	virtual FVector2D SelectedItemConvertWorldSpaceDeltaToLocalSpace(const FVector& WorldSpaceDelta) const override;
 	virtual FVector2D WorldSpaceToTextureSpace(const FVector& SourcePoint) const override;
@@ -56,6 +58,8 @@ public:
 	virtual void EndTransaction() override;
 	virtual void InvalidateViewportAndHitProxies() override;
 	// End of ISpriteSelectionContext interface
+	
+	void ActivateEditMode();
 
 	void ToggleShowPivot() { bShowPivot = !bShowPivot;/* EPropertyEditorGuidActions::Invalidate(); */}
 	bool IsShowPivotChecked() const { return bShowPivot; }
@@ -107,7 +111,10 @@ private:
 	// Should we zoom to the focus bounds next tick?
 	bool bDeferZoomToSprite;
 	bool bDeferZoomToSpriteIsInstant;
-
+	
+	// Are we currently manipulating something?
+	bool bManipulating;
+	
 	// The flipbook being displayed in this client
 	TAttribute<UCombatFlipbook*> CombatFlipbookBeingEdited;
 

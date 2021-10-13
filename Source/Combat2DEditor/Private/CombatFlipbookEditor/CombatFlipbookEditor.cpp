@@ -139,8 +139,15 @@ void FCombatFlipbookEditor::InitCombatFlipbookEditor(const EToolkitMode::Type Mo
 		bCreateDefaultToolbar,
 		reinterpret_cast<UObject*>(InCombatFlipbook));
 
+	ActivateEditMode();
+	
 	ExtendToolbar();
 	RegenerateMenusAndToolbars();
+}
+
+void FCombatFlipbookEditor::ActivateEditMode()
+{
+	ViewportPtr->ActivateEditMode();
 }
 
 FCombatFlipbookEditor::~FCombatFlipbookEditor()

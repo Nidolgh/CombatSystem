@@ -794,7 +794,7 @@ void FSpriteGeometryEditingHelper::ToggleShowNormals()
 
 void FSpriteGeometryEditingHelper::SetGeometryBeingEdited(FSpriteGeometryCollection* NewGeometryBeingEdited, bool bInAllowCircles, bool bInAllowSubtractivePolygons)
 {
-	ClearSelectionSet();
+	//ClearSelectionSet();
 	GeometryBeingEdited = NewGeometryBeingEdited;
 	bAllowCircles = bInAllowCircles;
 	bAllowSubtractivePolygons = bInAllowSubtractivePolygons;

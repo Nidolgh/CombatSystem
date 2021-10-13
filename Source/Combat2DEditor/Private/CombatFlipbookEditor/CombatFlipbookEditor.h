@@ -59,6 +59,8 @@ public:
 	void CreateKeyFrameInstructionOnCurrentFrame();
 	int32 GetCurrentFrame() const;
 
+	void ActivateEditMode();
+	
 public:
 	/** The name given to all instances of this type of editor */
 	static const FName ToolkitFName;
