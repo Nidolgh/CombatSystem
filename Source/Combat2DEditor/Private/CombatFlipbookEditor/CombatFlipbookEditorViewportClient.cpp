@@ -13,7 +13,7 @@
 #include "CombatFlipbookEditor.h"
 
 #include "PaperFlipbookComponent.h"
-#include "SpriteEditing/SpriteGeometryEditCommands.h"
+#include "SpriteEditing/CombatSpriteGeometryEditCommands.h"
 
 #include "CombatFlipbook.h"
 
@@ -58,6 +58,7 @@ FCombatFlipbookEditorViewportClient::FCombatFlipbookEditorViewportClient(TWeakPt
 	FEditorViewportClient(new FAssetEditorModeManager(), nullptr, InCombatFlipbookEditorViewportPtr)
 	, bManipulating(false)
 	, CombatFlipbookEditorPtr(InSpriteEditor)
+	, CombatFlipbookEditorViewportPtr(InCombatFlipbookEditorViewportPtr)
 {
 	check(CombatFlipbookEditorPtr.IsValid());
 
@@ -92,14 +93,6 @@ FCombatFlipbookEditorViewportClient::FCombatFlipbookEditorViewportClient(TWeakPt
 	// keep direction in mind
 	const ELevelViewportType NewViewportType = LVT_OrthoXZ;
 	SetViewportType(NewViewportType);
-
-	//setup the geometry edit mode
-	GeometryEditMode = MakeShareable(new FSpriteGeometryEditMode());
-	GeometryEditMode->SetEditorContext(this);
-	GeometryEditMode->SetModeTools(GetModeTools());
-	GeometryEditMode->SetGeometryColors(
-		FLinearColor(1.f, 1.f, 1.f, 1.f), 
-		FLinearColor(1.f, 0.f, 1.f, 1.f));
 }
 
 void FCombatFlipbookEditorViewportClient::DrawCanvas(FViewport& InViewport, FSceneView& View, FCanvas& Canvas)
@@ -346,10 +339,19 @@ void FCombatFlipbookEditorViewportClient::ActivateEditMode()
 {
 	// Activate the sprite geometry edit mode
 	ModeTools->SetToolkitHost(CombatFlipbookEditorPtr.Pin()->GetToolkitHost());
-	ModeTools->SetDefaultMode(FSpriteGeometryEditMode::EM_SpriteGeometry);
+	ModeTools->SetDefaultMode(FCombatSpriteGeometryEditMode::EM_CombatSpriteGeometry);
 	ModeTools->ActivateDefaultMode();
 
-	// GeometryEditMode->BindCommands(.Pin()->GetCommandList());
+	//setup the geometry edit mode
+	GeometryEditMode = MakeShareable(new FCombatSpriteGeometryEditMode());
+	GeometryEditMode->SetEditorContext(this);
+	GeometryEditMode->SetModeTools(GetModeTools());
+	GeometryEditMode->BindCommands(CombatFlipbookEditorViewportPtr.Pin()->GetCommandList());
+
+	GeometryEditMode->SetGeometryColors(
+		FLinearColor(1.f, 1.f, 1.f, 1.f), 
+		FLinearColor(1.f, 0.f, 1.f, 1.f));
+
 	ModeTools->SetWidgetMode(FWidget::WM_Translate);
 }
 
@@ -380,16 +382,6 @@ FCombatFrames* FCombatFlipbookEditorViewportClient::GetCombatFrameDataOnCurrentF
 UPaperFlipbookComponent * FCombatFlipbookEditorViewportClient::GetPreviewComponent() const
 {
 	return AnimatedRenderComponent.Get();
-}
-
-void FCombatFlipbookEditorViewportClient::BindCommands()
-{	
-	const FSpriteGeometryEditCommands& Commands = FSpriteGeometryEditCommands::Get();
-
-	const TSharedRef<FSpriteGeometryEditMode> GeometryEditRef = GeometryEditMode.ToSharedRef();
-
-	FSpriteGeometryEditingHelper* GeometryHelper = GeometryEditMode->GetGeometryHelper();
-	return;
 }
 
 FBox FCombatFlipbookEditorViewportClient::GetDesiredFocusBounds() const

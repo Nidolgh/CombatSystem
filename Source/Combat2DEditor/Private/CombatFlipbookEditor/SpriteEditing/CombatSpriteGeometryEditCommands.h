@@ -6,11 +6,11 @@
 #include "Framework/Commands/Commands.h"
 #include "Combat2DStyle.h"
 
-class FSpriteGeometryEditCommands : public TCommands<FSpriteGeometryEditCommands>
+class FCombatSpriteGeometryEditCommands : public TCommands<FCombatSpriteGeometryEditCommands>
 {
 public:
-	FSpriteGeometryEditCommands()
-		: TCommands<FSpriteGeometryEditCommands>(
+	FCombatSpriteGeometryEditCommands()
+		: TCommands<FCombatSpriteGeometryEditCommands>(
 			TEXT("SpriteGeometryEditor"), // Context name for fast lookup
 			NSLOCTEXT("Contexts", "SpriteGeometryEditor", "Sprite Geometry Editor"), // Localized context name for displaying
 			NAME_None, // Parent

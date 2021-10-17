@@ -1,6 +1,7 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
 #include "Combat2DEditorModule.h"
+#include "EditorModeRegistry.h"
 
 #include "Combat2DStyle.h"
 
@@ -9,6 +10,8 @@
 
 #include "CombatFlipbookAssetTypeActions.h"
 #include "CombatMovesetAssetTypeActions.h"
+
+#include "CombatFlipbookEditor/SpriteEditing/CombatSpriteGeometryEditMode.h"
 
 #define LOCTEXT_NAMESPACE "FCombat2DEditorModule"
 
@@ -21,6 +24,12 @@ void FCombat2DEditorModule::StartupModule()
 	
 	RegisterAssetTypeAction(AssetTools, MakeShareable(new FCombatFlipbookAssetTypeActions()));
 	//RegisterAssetTypeAction(AssetTools, MakeShareable(new FCombatMovesetAssetTypeActions()));
+
+	FEditorModeRegistry::Get().RegisterMode<FCombatSpriteGeometryEditMode>(
+		FCombatSpriteGeometryEditMode::EM_CombatSpriteGeometry,
+		LOCTEXT("CombatSpriteGeometryEditMode", "Combat Sprite Geometry Editor"),
+		FSlateIcon(),
+		false);
 
 	FCombat2DStyle::Initialize();
 }
@@ -39,6 +48,8 @@ void FCombat2DEditorModule::ShutdownModule()
 			AssetTools.UnregisterAssetTypeActions(CreatedAssetTypeActions[i].ToSharedRef());
 		}
 	}
+
+	FEditorModeRegistry::Get().UnregisterMode(FCombatSpriteGeometryEditMode::EM_CombatSpriteGeometry);
 
 	CreatedAssetTypeActions.Empty();
 	

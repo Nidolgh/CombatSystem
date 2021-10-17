@@ -1,6 +1,6 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
-#include "SpriteGeometryEditMode.h"
+#include "CombatSpriteGeometryEditMode.h"
 #include "SceneView.h"
 #include "EditorViewportClient.h"
 #include "Framework/Commands/UICommandList.h"
@@ -10,20 +10,20 @@
 #include "AssetEditorSelectedItem.h"
 #include "SpriteEditorOnlyTypes.h"
 #include "SpriteEditorSelections.h"
-#include "SpriteGeometryEditCommands.h"
+#include "CombatSpriteGeometryEditCommands.h"
 #include "Utils.h"
 #include "PhysicsEngine/BodySetup.h"
 
-#define LOCTEXT_NAMESPACE "PaperGeometryEditing"
+#define LOCTEXT_NAMESPACE "CombatSpriteGeometryEditing"
 
 //////////////////////////////////////////////////////////////////////////
-// FSpriteGeometryEditMode
+// FCombatSpriteGeometryEditMode
 
-const FEditorModeID FSpriteGeometryEditMode::EM_SpriteGeometry(TEXT("SpriteGeometryEditMode"));
+const FEditorModeID FCombatSpriteGeometryEditMode::EM_CombatSpriteGeometry(TEXT("CombatSpriteGeometryEditMode"));
 
-const FLinearColor FSpriteGeometryEditMode::MarqueeDrawColor(1.0f, 1.0f, 1.0f, 0.5f);
+const FLinearColor FCombatSpriteGeometryEditMode::MarqueeDrawColor(1.0f, 1.0f, 1.0f, 0.5f);
 
-FSpriteGeometryEditMode::FSpriteGeometryEditMode()
+FCombatSpriteGeometryEditMode::FCombatSpriteGeometryEditMode()
 	: BoundsForNewShapes(ForceInitToZero)
 	, GeometryVertexColorActive(FLinearColor::White)
 	, GeometryVertexColor(GeometryVertexColorActive)
@@ -42,11 +42,11 @@ FSpriteGeometryEditMode::FSpriteGeometryEditMode()
 	bDrawGrid = false;
 }
 
-void FSpriteGeometryEditMode::Initialize()
+void FCombatSpriteGeometryEditMode::Initialize()
 {
 }
 
-void FSpriteGeometryEditMode::DrawHUD(FEditorViewportClient* ViewportClient, FViewport* Viewport, const FSceneView* View, FCanvas* Canvas)
+void FCombatSpriteGeometryEditMode::DrawHUD(FEditorViewportClient* ViewportClient, FViewport* Viewport, const FSceneView* View, FCanvas* Canvas)
 {
 	FEdMode::DrawHUD(ViewportClient, Viewport, View, Canvas);
 	
@@ -75,7 +75,7 @@ void FSpriteGeometryEditMode::DrawHUD(FEditorViewportClient* ViewportClient, FVi
 	}
 }
 
-void FSpriteGeometryEditMode::Render(const FSceneView* View, FViewport* Viewport, FPrimitiveDrawInterface* PDI)
+void FCombatSpriteGeometryEditMode::Render(const FSceneView* View, FViewport* Viewport, FPrimitiveDrawInterface* PDI)
 {
 	FEdMode::Render(View, Viewport, PDI);
 
@@ -98,7 +98,7 @@ void FSpriteGeometryEditMode::Render(const FSceneView* View, FViewport* Viewport
 	}
 }
 
-bool FSpriteGeometryEditMode::HandleClick(FEditorViewportClient* InViewportClient, HHitProxy* HitProxy, const FViewportClick& Click)
+bool FCombatSpriteGeometryEditMode::HandleClick(FEditorViewportClient* InViewportClient, HHitProxy* HitProxy, const FViewportClick& Click)
 {
 	FViewport* Viewport = InViewportClient->Viewport;
 
@@ -227,7 +227,7 @@ bool FSpriteGeometryEditMode::HandleClick(FEditorViewportClient* InViewportClien
 	return bHandled ? true : FEdMode::HandleClick(InViewportClient, HitProxy, Click);
 }
 
-bool FSpriteGeometryEditMode::InputKey(FEditorViewportClient* ViewportClient, FViewport* Viewport, FKey Key, EInputEvent Event)
+bool FCombatSpriteGeometryEditMode::InputKey(FEditorViewportClient* ViewportClient, FViewport* Viewport, FKey Key, EInputEvent Event)
 {
 	bool bHandled = false;
 	FInputEventState InputState(Viewport, Key, Event);
@@ -283,7 +283,7 @@ bool FSpriteGeometryEditMode::InputKey(FEditorViewportClient* ViewportClient, FV
 	return bHandled ? true : FEdMode::InputKey(ViewportClient, Viewport, Key, Event);
 }
 
-void FSpriteGeometryEditMode::Tick(FEditorViewportClient* ViewportClient, float DeltaTime)
+void FCombatSpriteGeometryEditMode::Tick(FEditorViewportClient* ViewportClient, float DeltaTime)
 {
 	if (bIsMarqueeTracking)
 	{
@@ -295,12 +295,12 @@ void FSpriteGeometryEditMode::Tick(FEditorViewportClient* ViewportClient, float 
 	FEdMode::Tick(ViewportClient, DeltaTime);
 }
 
-bool FSpriteGeometryEditMode::ShouldDrawWidget() const
+bool FCombatSpriteGeometryEditMode::ShouldDrawWidget() const
 {
 	return SpriteGeometryHelper.HasAnySelectedItems();
 }
 
-FVector FSpriteGeometryEditMode::GetWidgetLocation() const
+FVector FCombatSpriteGeometryEditMode::GetWidgetLocation() const
 {
 	FVector SummedPos(ForceInitToZero);
 
@@ -317,7 +317,7 @@ FVector FSpriteGeometryEditMode::GetWidgetLocation() const
 	return SummedPos;
 }
 
-bool FSpriteGeometryEditMode::InputDelta(FEditorViewportClient* InViewportClient, FViewport* InViewport, FVector& InDrag, FRotator& InRot, FVector& InScale)
+bool FCombatSpriteGeometryEditMode::InputDelta(FEditorViewportClient* InViewportClient, FViewport* InViewport, FVector& InDrag, FRotator& InRot, FVector& InScale)
 {
 	bool bHandled = false;
 
@@ -348,23 +348,23 @@ bool FSpriteGeometryEditMode::InputDelta(FEditorViewportClient* InViewportClient
 	return bHandled ? true : FEdMode::InputDelta(InViewportClient, InViewport, InDrag, InRot, InScale);
 }
 
-void FSpriteGeometryEditMode::SetEditorContext(class ISpriteSelectionContext* InNewEditorContext)
+void FCombatSpriteGeometryEditMode::SetEditorContext(class ISpriteSelectionContext* InNewEditorContext)
 {
 	SpriteGeometryHelper.SetEditorContext(InNewEditorContext);
 }
 
-void FSpriteGeometryEditMode::SetNewGeometryPreferredBounds(FBox2D& NewDesiredBounds)
+void FCombatSpriteGeometryEditMode::SetNewGeometryPreferredBounds(FBox2D& NewDesiredBounds)
 {
 	BoundsForNewShapes = NewDesiredBounds;
 }
 
-void FSpriteGeometryEditMode::SetGeometryColors(const FLinearColor& NewVertexColor, const FLinearColor& NewNegativeVertexColor)
+void FCombatSpriteGeometryEditMode::SetGeometryColors(const FLinearColor& NewVertexColor, const FLinearColor& NewNegativeVertexColor)
 {
 	GeometryVertexColor = NewVertexColor;
 	NegativeGeometryVertexColor = NewNegativeVertexColor;
 }
 
-void FSpriteGeometryEditMode::SetKeyFrameInstructionsBeingEdited(TArray<FCombatFrameCollisionData>* NewKeyFrameInstructions, int32* NewInstructionToEdit, bool bInAllowCircles, bool bInAllowSubtractivePolygons)
+void FCombatSpriteGeometryEditMode::SetKeyFrameInstructionsBeingEdited(TArray<FCombatFrameCollisionData>* NewKeyFrameInstructions, int32* NewInstructionToEdit, bool bInAllowCircles, bool bInAllowSubtractivePolygons)
 {
 	InstructionToEdit = NewInstructionToEdit;
 	KeyFrameInstructions = NewKeyFrameInstructions;
@@ -372,9 +372,9 @@ void FSpriteGeometryEditMode::SetKeyFrameInstructionsBeingEdited(TArray<FCombatF
 	bIsMarqueeTracking = false;
 }
 
-void FSpriteGeometryEditMode::BindCommands(TSharedPtr<FUICommandList> CommandList)
+void FCombatSpriteGeometryEditMode::BindCommands(TSharedPtr<FUICommandList> CommandList)
 {
-	const FSpriteGeometryEditCommands& Commands = FSpriteGeometryEditCommands::Get();
+	const FCombatSpriteGeometryEditCommands& Commands = FCombatSpriteGeometryEditCommands::Get();
 
 	// Show toggles
 	//CommandList->MapAction(
@@ -391,7 +391,7 @@ void FSpriteGeometryEditMode::BindCommands(TSharedPtr<FUICommandList> CommandLis
 	
 	CommandList->MapAction(
 		Commands.AddBoxShape,
-		FExecuteAction::CreateSP(this, &FSpriteGeometryEditMode::AddBoxShape),
+		FExecuteAction::CreateSP(this, &FCombatSpriteGeometryEditMode::AddBoxShape),
 		FCanExecuteAction::CreateRaw(&SpriteGeometryHelper, &FSpriteGeometryEditingHelper::CanAddBoxShape),
 		FIsActionChecked(),
 		FIsActionButtonVisible::CreateRaw(&SpriteGeometryHelper, &FSpriteGeometryEditingHelper::CanAddBoxShape));
@@ -404,7 +404,7 @@ void FSpriteGeometryEditMode::BindCommands(TSharedPtr<FUICommandList> CommandLis
 		FIsActionButtonVisible::CreateRaw(&SpriteGeometryHelper, &FSpriteGeometryEditingHelper::CanAddPolygon));
 	CommandList->MapAction(
 		Commands.AddCircleShape,
-		FExecuteAction::CreateSP(this, &FSpriteGeometryEditMode::AddCircleShape),
+		FExecuteAction::CreateSP(this, &FCombatSpriteGeometryEditMode::AddCircleShape),
 		FCanExecuteAction::CreateRaw(&SpriteGeometryHelper, &FSpriteGeometryEditingHelper::CanAddCircleShape),
 		FIsActionChecked(),
 		FIsActionButtonVisible::CreateRaw(&SpriteGeometryHelper, &FSpriteGeometryEditingHelper::CanAddCircleShape));*/
@@ -417,12 +417,12 @@ void FSpriteGeometryEditMode::BindCommands(TSharedPtr<FUICommandList> CommandLis
 }
 
 
-void FSpriteGeometryEditMode::AddBoxShape()
+void FCombatSpriteGeometryEditMode::AddBoxShape()
 {
 	SpriteGeometryHelper.AddNewBoxShape(BoundsForNewShapes.GetCenter(), BoundsForNewShapes.GetSize());
 }
 
-void FSpriteGeometryEditMode::AddCircleShape()
+void FCombatSpriteGeometryEditMode::AddCircleShape()
 {
 	const float SmallerBoundingAxisSize = BoundsForNewShapes.GetSize().GetMin();
 	const float CircleRadius = SmallerBoundingAxisSize * 0.5f;
@@ -430,12 +430,12 @@ void FSpriteGeometryEditMode::AddCircleShape()
 	SpriteGeometryHelper.AddNewCircleShape(BoundsForNewShapes.GetCenter(), CircleRadius);
 }
 
-void FSpriteGeometryEditMode::SetModeTools(FEditorModeTools *ModeTools)
+void FCombatSpriteGeometryEditMode::SetModeTools(FEditorModeTools *ModeTools)
 {
 	Owner = ModeTools;
 }
 
-void FSpriteGeometryEditMode::SetActiveGeometryColor(const ECollisionType InsType, const bool IsActive)
+void FCombatSpriteGeometryEditMode::SetActiveGeometryColor(const ECollisionType InsType, const bool IsActive)
 {	
 	switch(InsType)
 	{
@@ -458,7 +458,7 @@ void FSpriteGeometryEditMode::SetActiveGeometryColor(const ECollisionType InsTyp
 	}
 }
 
-void FSpriteGeometryEditMode::SetEditingGeometry()
+void FCombatSpriteGeometryEditMode::SetEditingGeometry()
 {
 	if (InstructionToEdit != nullptr && KeyFrameInstructions->IsValidIndex(*InstructionToEdit))
 	{
@@ -468,12 +468,12 @@ void FSpriteGeometryEditMode::SetEditingGeometry()
 	}
 }
 
-bool FSpriteGeometryEditMode::IsEditingGeometry() const
+bool FCombatSpriteGeometryEditMode::IsEditingGeometry() const
 {
 	return SpriteGeometryHelper.IsEditingGeometry();
 }
 
-void FSpriteGeometryEditMode::SelectVerticesInMarquee(FEditorViewportClient* ViewportClient, FViewport* Viewport, bool bAddToSelection)
+void FCombatSpriteGeometryEditMode::SelectVerticesInMarquee(FEditorViewportClient* ViewportClient, FViewport* Viewport, bool bAddToSelection)
 {
 	if (!bAddToSelection)
 	{
@@ -546,7 +546,7 @@ void FSpriteGeometryEditMode::SelectVerticesInMarquee(FEditorViewportClient* Vie
 	}
 }
 
-bool FSpriteGeometryEditMode::ProcessMarquee(FViewport* Viewport, FKey Key, EInputEvent Event, bool bMarqueeStartModifierPressed)
+bool FCombatSpriteGeometryEditMode::ProcessMarquee(FViewport* Viewport, FKey Key, EInputEvent Event, bool bMarqueeStartModifierPressed)
 {
 	bool bMarqueeReady = false;
 
@@ -581,7 +581,7 @@ bool FSpriteGeometryEditMode::ProcessMarquee(FViewport* Viewport, FKey Key, EInp
 	return bMarqueeReady;
 }
 
-void FSpriteGeometryEditMode::DrawMarquee(FViewport& InViewport, const FSceneView& View, FCanvas& Canvas, const FLinearColor& Color)
+void FCombatSpriteGeometryEditMode::DrawMarquee(FViewport& InViewport, const FSceneView& View, FCanvas& Canvas, const FLinearColor& Color)
 {
 	FVector2D MarqueeDelta = MarqueeEndPos - MarqueeStartPos;
 	FVector2D MarqueeVertices[4];
@@ -599,7 +599,7 @@ void FSpriteGeometryEditMode::DrawMarquee(FViewport& InViewport, const FSceneVie
 }
 
 
-void FSpriteGeometryEditMode::DrawGeometryStats(FViewport& InViewport, FSceneView& View, FCanvas& Canvas, const FSpriteGeometryCollection& Geometry, bool bIsRenderGeometry, int32& YPos)
+void FCombatSpriteGeometryEditMode::DrawGeometryStats(FViewport& InViewport, FSceneView& View, FCanvas& Canvas, const FSpriteGeometryCollection& Geometry, bool bIsRenderGeometry, int32& YPos)
 {
 	// Draw the type of geometry we're displaying stats for
 	const FText GeometryName = bIsRenderGeometry ? LOCTEXT("RenderGeometry", "Render Geometry (source)") : LOCTEXT("CollisionGeometry", "Collision Geometry (source)");
@@ -629,7 +629,7 @@ void FSpriteGeometryEditMode::DrawGeometryStats(FViewport& InViewport, FSceneVie
 	YPos = (int32)TextItem.Position.Y;
 }
 
-void FSpriteGeometryEditMode::DrawCollisionStats(FViewport& InViewport, FSceneView& View, FCanvas& Canvas, class UBodySetup* BodySetup, int32& YPos)
+void FCombatSpriteGeometryEditMode::DrawCollisionStats(FViewport& InViewport, FSceneView& View, FCanvas& Canvas, class UBodySetup* BodySetup, int32& YPos)
 {
 	FCanvasTextItem TextItem(FVector2D(6, YPos), LOCTEXT("CollisionGeomBaked", "Collision Geometry (baked)"), GEngine->GetSmallFont(), FLinearColor::White);
 	TextItem.EnableShadow(FLinearColor::Black);

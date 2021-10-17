@@ -11,7 +11,7 @@
 #include "CombatFlipbookEditorViewportClient.h"
 
 #include "SpriteEditing/SpriteEditorSelections.h"
-#include "SpriteEditing/SpriteGeometryEditMode.h"
+#include "SpriteEditing/CombatSpriteGeometryEditMode.h"
 
 class UPaperFlipbookComponent;
 class FCanvas;
@@ -84,7 +84,7 @@ public:
 	// List of selection rectangles to draw
 	TArray<FViewportSelectionRectangle> SelectionRectangles;
 
-	TSharedPtr<FSpriteGeometryEditMode> GeometryEditMode;
+	TSharedPtr<FCombatSpriteGeometryEditMode> GeometryEditMode;
 
 protected:
 	/** Checkerboard texture */
@@ -92,7 +92,6 @@ protected:
 	FVector2D ZoomPos;
 	float ZoomAmount;
 
-	void BindCommands();
 	FBox GetDesiredFocusBounds() const;
 private:
 
@@ -101,6 +100,7 @@ private:
 
 	// Sprite editor that owns this viewport
 	TWeakPtr<FCombatFlipbookEditor> CombatFlipbookEditorPtr;
+	TWeakPtr<SEditorViewport> CombatFlipbookEditorViewportPtr;
 
 	// Render component for the sprite being edited
 	TWeakObjectPtr<UPaperFlipbookComponent> AnimatedRenderComponent;

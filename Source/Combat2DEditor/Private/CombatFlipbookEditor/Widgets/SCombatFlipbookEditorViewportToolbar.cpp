@@ -5,7 +5,7 @@
 #include "SEditorViewport.h"
 
 #include "CombatFlipbookEditor/CombatFlipbookEditorCommands.h"
-#include "CombatFlipbookEditor/SpriteEditing/SpriteGeometryEditCommands.h"
+#include "CombatFlipbookEditor/SpriteEditing/CombatSpriteGeometryEditCommands.h"
 
 #define LOCTEXT_NAMESPACE "SSpriteEditorViewportToolbar"
 
@@ -30,7 +30,7 @@ TSharedRef<SWidget> SCombatFlipbookEditorViewportToolbar::GenerateShowMenu() con
 
 		ShowMenuBuilder.AddMenuEntry(FCombatFlipbookEditorCommands::Get().SetShowGrid);
 		ShowMenuBuilder.AddMenuEntry(FCombatFlipbookEditorCommands::Get().SetShowBounds);
-		ShowMenuBuilder.AddMenuEntry(FSpriteGeometryEditCommands::Get().SetShowNormals);
+		ShowMenuBuilder.AddMenuEntry(FCombatSpriteGeometryEditCommands::Get().SetShowNormals);
 
 		ShowMenuBuilder.AddMenuSeparator();
 

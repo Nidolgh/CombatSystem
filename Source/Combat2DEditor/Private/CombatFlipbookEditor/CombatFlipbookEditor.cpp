@@ -9,7 +9,7 @@
 #include "PropertyEditorModule.h"
 #include "IDetailsView.h"
 #include "PaperFlipbookComponent.h"
-#include "SpriteEditing/SpriteGeometryEditCommands.h"
+#include "SpriteEditing/CombatSpriteGeometryEditCommands.h"
 
 #include "SScrubControlPanel.h"
 #include "Widgets/Docking/SDockTab.h"
@@ -81,7 +81,7 @@ void FCombatFlipbookEditor::InitCombatFlipbookEditor(const EToolkitMode::Type Mo
 	CombatFlipbookBeingEdited = InCombatFlipbook;
 
 	FCombatFlipbookEditorCommands::Register();
-	FSpriteGeometryEditCommands::Register();
+	FCombatSpriteGeometryEditCommands::Register();
 
 	TSharedPtr<FCombatFlipbookEditor> CombatFlipbookEditorPtr = SharedThis(this);
 	ViewportPtr = SNew(SCombatFlipbookEditorViewport, CombatFlipbookEditorPtr);
@@ -244,8 +244,8 @@ void FCombatFlipbookEditor::ExtendToolbar()
 	{
 		static void FillToolbar(FToolBarBuilder& ToolbarBuilder)
 		{
-			const FSpriteGeometryEditCommands& GeometryCommands =
-				FSpriteGeometryEditCommands::Get();
+			const FCombatSpriteGeometryEditCommands& GeometryCommands =
+				FCombatSpriteGeometryEditCommands::Get();
 			ToolbarBuilder.BeginSection("Tools");
 			{
 				ToolbarBuilder.AddToolBarButton(GeometryCommands.AddBoxShape);

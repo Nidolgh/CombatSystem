@@ -19,16 +19,16 @@ struct FSpriteGeometryCollection;
 struct FViewportClick;
 
 //////////////////////////////////////////////////////////////////////////
-// FSpriteGeometryEditMode
+// FCombatSpriteGeometryEditMode
 
-class FSpriteGeometryEditMode : public FEdMode
+class FCombatSpriteGeometryEditMode : public FEdMode
 {
 public:
-	static const FEditorModeID EM_SpriteGeometry;
+	static const FEditorModeID EM_CombatSpriteGeometry;
 	static const FLinearColor MarqueeDrawColor;
 	
 public:
-	FSpriteGeometryEditMode();
+	FCombatSpriteGeometryEditMode();
 
 	// FEdMode interface
 	virtual void Initialize() override;

@@ -4,8 +4,8 @@
 #include "CombatFlipbookEditorCommands.h"
 #include "CombatFlipbookEditorViewportClient.h"
 
-#include "SpriteEditing/SpriteGeometryEditCommands.h"
-#include "SpriteEditing/SpriteGeometryEditMode.h"
+#include "SpriteEditing/CombatSpriteGeometryEditCommands.h"
+#include "SpriteEditing/CombatSpriteGeometryEditMode.h"
 
 #include "Widgets/SCombatFlipbookEditorViewportToolbar.h"
 
@@ -59,60 +59,6 @@ void SCombatFlipbookEditorViewport::BindCommands()
 		FCanExecuteAction(),
 		FIsActionChecked::CreateSP(EditorViewportClientRef,
 			&FCombatFlipbookEditorViewportClient::IsShowPivotChecked));
-
-	const FSpriteGeometryEditCommands& Commands2 = FSpriteGeometryEditCommands::Get();
-	const TSharedRef<FSpriteGeometryEditMode> GeometryEditRef = EditorViewportClientRef.Get().GeometryEditMode.
-		ToSharedRef();
-	FSpriteGeometryEditingHelper* GeometryHelper = GeometryEditRef->GetGeometryHelper();
-
-	CommandList->MapAction(
-		Commands2.AddBoxShape,
-		FExecuteAction::CreateSP(EditorViewportClientRef.Get().GeometryEditMode.ToSharedRef(),
-			&FSpriteGeometryEditMode::AddBoxShape),
-		FCanExecuteAction::CreateRaw(GeometryHelper, &FSpriteGeometryEditingHelper::CanAddBoxShape),
-		FIsActionChecked(),
-		FIsActionButtonVisible::CreateRaw(GeometryHelper, &FSpriteGeometryEditingHelper::CanAddBoxShape));
-
-	// Show toggles
-	CommandList->MapAction(
-		Commands2.SetShowNormals,
-		FExecuteAction::CreateRaw(GeometryHelper, &FSpriteGeometryEditingHelper::ToggleShowNormals),
-		FCanExecuteAction(),
-		FIsActionChecked::CreateRaw(GeometryHelper, &FSpriteGeometryEditingHelper::IsShowNormalsEnabled));
-
-	//// Geometry editing commands
-	CommandList->MapAction(
-		Commands2.DeleteSelection,
-		FExecuteAction::CreateRaw(GeometryHelper, &FSpriteGeometryEditingHelper::DeleteSelectedItems),
-		FCanExecuteAction::CreateRaw(GeometryHelper, &FSpriteGeometryEditingHelper::CanDeleteSelection));
-
-	CommandList->MapAction(
-		Commands2.AddBoxShape,
-		FExecuteAction::CreateSP(GeometryEditRef, &FSpriteGeometryEditMode::AddBoxShape),
-		FCanExecuteAction::CreateRaw(GeometryHelper, &FSpriteGeometryEditingHelper::CanAddBoxShape),
-		FIsActionChecked(),
-		FIsActionButtonVisible::CreateRaw(GeometryHelper, &FSpriteGeometryEditingHelper::CanAddBoxShape));
-
-	CommandList->MapAction(
-		Commands2.ToggleAddPolygonMode,
-		FExecuteAction::CreateRaw(GeometryHelper, &FSpriteGeometryEditingHelper::ToggleAddPolygonMode),
-		FCanExecuteAction::CreateRaw(GeometryHelper, &FSpriteGeometryEditingHelper::CanAddPolygon),
-		FIsActionChecked::CreateRaw(GeometryHelper, &FSpriteGeometryEditingHelper::IsAddingPolygon),
-		FIsActionButtonVisible::CreateRaw(GeometryHelper, &FSpriteGeometryEditingHelper::CanAddPolygon));
-
-	CommandList->MapAction(
-		Commands2.AddCircleShape,
-		FExecuteAction::CreateSP(GeometryEditRef, &FSpriteGeometryEditMode::AddCircleShape),
-		FCanExecuteAction::CreateRaw(GeometryHelper, &FSpriteGeometryEditingHelper::CanAddCircleShape),
-		FIsActionChecked(),
-		FIsActionButtonVisible::CreateRaw(GeometryHelper, &FSpriteGeometryEditingHelper::CanAddCircleShape));
-
-	CommandList->MapAction(
-		Commands2.SnapAllVertices,
-		FExecuteAction::CreateRaw(GeometryHelper, &FSpriteGeometryEditingHelper::SnapAllVerticesToPixelGrid),
-		FCanExecuteAction::CreateRaw(GeometryHelper, &FSpriteGeometryEditingHelper::CanSnapVerticesToPixelGrid),
-		FIsActionChecked(),
-		FIsActionButtonVisible::CreateRaw(GeometryHelper, &FSpriteGeometryEditingHelper::CanSnapVerticesToPixelGrid));
 }
 
 TSharedRef<FEditorViewportClient>

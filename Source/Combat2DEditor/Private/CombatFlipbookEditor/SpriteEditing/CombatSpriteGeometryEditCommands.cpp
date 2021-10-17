@@ -1,11 +1,11 @@
-#include "SpriteGeometryEditCommands.h"
+#include "CombatSpriteGeometryEditCommands.h"
 
-#define LOCTEXT_NAMESPACE "SpriteGeometryEditCommands"
+#define LOCTEXT_NAMESPACE "CombatSpriteGeometryEditCommands"
 
 //////////////////////////////////////////////////////////////////////////
-// FSpriteGeometryEditCommands
+// FCombatSpriteGeometryEditCommands
 
-void FSpriteGeometryEditCommands::RegisterCommands()
+void FCombatSpriteGeometryEditCommands::RegisterCommands()
 {
 	// Show toggles
 	UI_COMMAND(SetShowNormals, "Normals", "Toggles display of vertex normals in the Preview Pane.", EUserInterfaceActionType::ToggleButton, FInputChord());
