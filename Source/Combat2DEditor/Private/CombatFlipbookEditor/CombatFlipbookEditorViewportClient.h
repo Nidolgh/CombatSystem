@@ -84,7 +84,7 @@ public:
 	// List of selection rectangles to draw
 	TArray<FViewportSelectionRectangle> SelectionRectangles;
 
-	TSharedPtr<FCombatSpriteGeometryEditMode> GeometryEditMode;
+	FCombatSpriteGeometryEditMode* GeometryEditMode;
 
 protected:
 	/** Checkerboard texture */

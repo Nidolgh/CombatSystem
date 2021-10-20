@@ -343,7 +343,7 @@ void FCombatFlipbookEditorViewportClient::ActivateEditMode()
 	ModeTools->ActivateDefaultMode();
 
 	//setup the geometry edit mode
-	GeometryEditMode = MakeShareable(new FCombatSpriteGeometryEditMode());
+	GeometryEditMode = (FCombatSpriteGeometryEditMode*)ModeTools->GetActiveMode(FCombatSpriteGeometryEditMode::EM_CombatSpriteGeometry);
 	GeometryEditMode->SetEditorContext(this);
 	GeometryEditMode->SetModeTools(GetModeTools());
 	GeometryEditMode->BindCommands(CombatFlipbookEditorViewportPtr.Pin()->GetCommandList());
