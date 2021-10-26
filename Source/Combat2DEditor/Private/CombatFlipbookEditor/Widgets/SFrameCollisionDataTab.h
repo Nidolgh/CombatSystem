@@ -19,7 +19,7 @@ public:
 	virtual void Tick(const FGeometry& AllottedGeometry, const double InCurrentTime, const float InDeltaTime) override;
 	// End of SWidget interface
 
-	int32* GetButtonFrameID();
+	int32 GetButtonFrameID();
 
 private:
 	// Pointer back to owning sprite editor instance (the keeper of state)

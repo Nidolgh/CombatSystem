@@ -93,6 +93,9 @@ protected:
 	float ZoomAmount;
 
 	FBox GetDesiredFocusBounds() const;
+
+	void HandleKeyFrameChange();
+	void HandleCollisionDataIndexChange();
 private:
 
 	// The preview scene

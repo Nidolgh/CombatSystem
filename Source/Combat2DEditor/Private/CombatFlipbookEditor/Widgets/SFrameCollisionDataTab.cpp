@@ -176,7 +176,7 @@ void SFrameCollisionDataTab::Tick(const FGeometry& AllottedGeometry, const doubl
     }
 }
 
-int32* SFrameCollisionDataTab::GetButtonFrameID()
+int32 SFrameCollisionDataTab::GetButtonFrameID()
 {
-    return &ButtonFrameInstructionID;
+    return ButtonFrameInstructionID;
 }

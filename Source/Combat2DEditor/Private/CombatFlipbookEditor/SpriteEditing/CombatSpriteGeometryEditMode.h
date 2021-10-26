@@ -52,7 +52,7 @@ public:
 	void SetGeometryColors(const FLinearColor& NewVertexColor, const FLinearColor& NewNegativeVertexColor);
 
 	// Changes the geometry being edited (clears the selection set in the process)
-	void SetKeyFrameInstructionsBeingEdited(TArray<FCombatFrameCollisionData>* NewKeyFrameInstructions, int32* NewInstructionToEdit, bool bInAllowCircles, bool bInAllowSubtractivePolygons);
+	void SetCollFrameDataArrayBeingEdited(TArray<FCombatFrameCollisionData>* NewFrameCollDataArray, bool bInAllowCircles, bool bInAllowSubtractivePolygons);
 	
 	void BindCommands(TSharedPtr<FUICommandList> InCommandList);
 
@@ -70,6 +70,9 @@ public:
 
 	void SetModeTools(FEditorModeTools* ModeTools);
 
+	void SetCollDataToEditIndex(int32 newCollDataToEditIndex);
+	int32 GetCollDataToEditIndex() const;
+
 protected:
 	FBox2D BoundsForNewShapes;
 	FLinearColor GeometryVertexColorActive;
@@ -82,8 +85,9 @@ protected:
 	// Sprite geometry editing/rendering helper
 	FSpriteGeometryEditingHelper SpriteGeometryHelper;
 
-	TArray<FCombatFrameCollisionData>* KeyFrameInstructions;
-	int32* InstructionToEdit;
+	TArray<FCombatFrameCollisionData>* FrameCollDataArray;
+	int32 CollDataToEditIndex;
+	int32 PreviousCollDataToEditIndex;
 	
 	// Marquee tracking
 	bool bIsMarqueeTracking;

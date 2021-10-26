@@ -139,24 +139,9 @@ void FCombatFlipbookEditorViewportClient::Tick(float DeltaSeconds)
 {
 	GeometryEditMode->Tick(this, DeltaSeconds);
 
-	CurrentKeyFrameData = CombatFlipbookEditorPtr.Pin().Get()->CreateKeyFrameDataOnCurrentFrame();
-	if (CurrentKeyFrameData != nullptr && CurrentKeyFrameData != LastKeyFrameData) 
-	{
-		const int32 curFrame = CombatFlipbookEditorPtr.Pin().Get()->GetCurrentFrame();
-		FSpriteGeometryCollection* GeometryCollectionInstruction = CurrentKeyFrameData->CollisionDataArray.IsValidIndex(curFrame) ? &CurrentKeyFrameData->CollisionDataArray[0].CollisionGeometry : nullptr;
-		int32* InsID = CombatFlipbookEditorPtr.Pin().Get()->GetGeoPropTabBody()->GetButtonFrameID();
-
-		if (CurrentKeyFrameData->CollisionDataArray.Num() != 0)
-		{
-			GeometryEditMode->SetKeyFrameInstructionsBeingEdited(&CurrentKeyFrameData->CollisionDataArray, InsID, /*bAllowCircles=*/ false, /*bAllowSubtractivePolygons=*/ false);
-		}else
-		{
-			UE_LOG(LogTemp, Warning, TEXT("No frame instruction collection set"));
-		}
-
-		LastKeyFrameData = CurrentKeyFrameData;
-	}
-
+	HandleKeyFrameChange();
+	HandleCollisionDataIndexChange();
+	
 	if (AnimatedRenderComponent.IsValid())
 	{		
 		UPaperFlipbook* Flipbook = CombatFlipbookBeingEdited.Get()->TargetFlipbook;
@@ -168,31 +153,6 @@ void FCombatFlipbookEditorViewportClient::Tick(float DeltaSeconds)
 			AnimatedRenderComponent->SetFlipbook(Flipbook);
 			AnimatedRenderComponent->UpdateBounds();
 			FlipbookBeingEditedLastFrame = Flipbook;
-		}
-	}
-	
-	if (FSpriteGeometryCollection* GeometryCollectionInstruction = &CurrentKeyFrameData->CollisionDataArray[1].CollisionGeometry)
-	{
-		// Reposition the sprite (to be at the correct relative location to it's parent, undoing the pivot behavior)
-		/*const FVector2D PivotInTextureSpace = Sprite->ConvertPivotSpaceToTextureSpace(FVector2D::ZeroVector);
-		const FVector PivotInWorldSpace = TextureSpaceToWorldSpace(PivotInTextureSpace);
-		AnimatedRenderComponent->SetRelativeLocation(PivotInWorldSpace);*/
-
-		//bool bRenderTextureViewComponentVisibility = !IsInSourceRegionEditMode();
-		//if (bRenderTextureViewComponentVisibility != AnimatedRenderComponent->IsVisible())
-		//{
-		//	RequestFocusOnSelection(/*bInstant=*/ true);
-		//	AnimatedRenderComponent->SetVisibility(bRenderTextureViewComponentVisibility);
-		//}
-		if (GeometryCollectionInstruction->Shapes.IsValidIndex(0))
-		{
-			const FVector2D BoxSize(GeometryCollectionInstruction->Shapes[0].BoxSize);
-			const FVector2D BoxLocation(GeometryCollectionInstruction->Shapes[0].BoxPosition);
-			FBox2D SpriteBounds(ForceInitToZero);
-			SpriteBounds.Min = BoxLocation;
-			SpriteBounds.Max = BoxLocation + BoxSize;
-
-			GeometryEditMode->SetNewGeometryPreferredBounds(SpriteBounds);
 		}
 	}
 	
@@ -315,8 +275,6 @@ void FCombatFlipbookEditorViewportClient::MarkTransactionAsDirty()
 {
 	bManipulationDirtiedSomething = true;
 	Invalidate();
-	//@TODO: Can add a call to Sprite->PostEditChange here if we want to update the baked sprite data during a drag operation
-	// (maybe passing in Interactive - if so, the EndTransaction PostEditChange needs to be a ValueSet)
 }
 
 void FCombatFlipbookEditorViewportClient::EndTransaction()
@@ -387,6 +345,35 @@ UPaperFlipbookComponent * FCombatFlipbookEditorViewportClient::GetPreviewCompone
 FBox FCombatFlipbookEditorViewportClient::GetDesiredFocusBounds() const
 {
 	return AnimatedRenderComponent->Bounds.GetBox();
+}
+
+void FCombatFlipbookEditorViewportClient::HandleKeyFrameChange()
+{
+	CurrentKeyFrameData = CombatFlipbookEditorPtr.Pin()->CreateKeyFrameDataOnCurrentFrame();
+	if (CurrentKeyFrameData != nullptr && CurrentKeyFrameData != LastKeyFrameData) 
+	{
+		const int32 curFrame = CombatFlipbookEditorPtr.Pin()->GetCurrentFrame();
+		FSpriteGeometryCollection* GeometryCollectionInstruction = CurrentKeyFrameData->CollisionDataArray.IsValidIndex(curFrame) ? &CurrentKeyFrameData->CollisionDataArray[0].CollisionGeometry : nullptr;
+
+		if (CurrentKeyFrameData->CollisionDataArray.Num() != 0)
+		{
+			GeometryEditMode->SetCollFrameDataArrayBeingEdited(&CurrentKeyFrameData->CollisionDataArray, /*bAllowCircles=*/ true, /*bAllowSubtractivePolygons=*/ false);
+		}else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("No frame instruction collection set"));
+		}
+
+		LastKeyFrameData = CurrentKeyFrameData;
+	}
+}
+
+void FCombatFlipbookEditorViewportClient::HandleCollisionDataIndexChange()
+{
+	int32 InsID = CombatFlipbookEditorPtr.Pin()->GetGeoPropTabBody()->GetButtonFrameID();
+	if (InsID != GeometryEditMode->GetCollDataToEditIndex())
+	{
+		GeometryEditMode->SetCollDataToEditIndex(InsID);
+	}
 }
 
 //////////////////////////////////////////////////////////////////////////

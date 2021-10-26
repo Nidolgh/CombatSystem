@@ -34,7 +34,8 @@ FCombatSpriteGeometryEditMode::FCombatSpriteGeometryEditMode()
 	, bIsMarqueeTracking(false)
 	, MarqueeStartPos(ForceInitToZero)
 	, MarqueeEndPos(ForceInitToZero)
-	, InstructionToEdit(nullptr)
+	, CollDataToEditIndex(-1)
+	, PreviousCollDataToEditIndex(-1)
 {
 	BoundsForNewShapes.Max = FVector2D(20.0f, 20.0f);
 
@@ -50,22 +51,19 @@ void FCombatSpriteGeometryEditMode::DrawHUD(FEditorViewportClient* ViewportClien
 {
 	FEdMode::DrawHUD(ViewportClient, Viewport, View, Canvas);
 	
-	if (InstructionToEdit != nullptr && KeyFrameInstructions->IsValidIndex(*InstructionToEdit))
+	if (FrameCollDataArray->IsValidIndex(CollDataToEditIndex))
 	{
-		for (size_t i = 0; i < KeyFrameInstructions->Num(); i++)
+		// for (size_t i = 0; i < FrameCollDataArray->Num(); i++)
 		{
-			FCombatFrameCollisionData* FrameInstruction = &KeyFrameInstructions->GetData()[i];
-			FSpriteGeometryCollection* GeoColl = &FrameInstruction->CollisionGeometry;
+			FCombatFrameCollisionData* FrameCollData = &FrameCollDataArray->GetData()[CollDataToEditIndex];
+			FSpriteGeometryCollection* TheGeometryCollection = &FrameCollData->CollisionGeometry;
 
-			SetActiveGeometryColor(FrameInstruction->CollisionType, ((*InstructionToEdit) == i));
+			SpriteGeometryHelper.SetGeometryBeingEdited(TheGeometryCollection, true, false);
 
-			if (SpriteGeometryHelper.GetGeometryBeingEdited() != GeoColl)
-			{
-				SpriteGeometryHelper.SetGeometryBeingEdited(GeoColl, false, false);
+			SetActiveGeometryColor(FrameCollData->CollisionType, true);
 
-				int32 YPos = 42;
-				SpriteGeometryHelper.DrawGeometry_CanvasPass(*Viewport, *View, *Canvas, /*inout*/ YPos, GeometryVertexColorActive, NegativeGeometryVertexColor);
-			}
+			int32 YPos = 42;
+			SpriteGeometryHelper.DrawGeometry_CanvasPass(*Viewport, *View, *Canvas, YPos, GeometryVertexColorActive, NegativeGeometryVertexColor);
 		}
 	}
 	
@@ -79,21 +77,18 @@ void FCombatSpriteGeometryEditMode::Render(const FSceneView* View, FViewport* Vi
 {
 	FEdMode::Render(View, Viewport, PDI);
 
-	if (InstructionToEdit != nullptr && KeyFrameInstructions->IsValidIndex(*InstructionToEdit))
+	if (FrameCollDataArray->IsValidIndex(CollDataToEditIndex))
 	{
-		for (size_t i = 0; i < KeyFrameInstructions->Num(); i++)
+		for (size_t i = 0; i < FrameCollDataArray->Num(); i++)
 		{
-			FCombatFrameCollisionData* FrameInstruction = &KeyFrameInstructions->GetData()[i];
+			FCombatFrameCollisionData* FrameInstruction = &FrameCollDataArray->GetData()[i];
 			FSpriteGeometryCollection* GeoColl = &FrameInstruction->CollisionGeometry;
 			
-			SetActiveGeometryColor(FrameInstruction->CollisionType, ((*InstructionToEdit) == i));
+			SpriteGeometryHelper.SetGeometryBeingEdited(GeoColl, true, false);
 
-			if (SpriteGeometryHelper.GetGeometryBeingEdited() != GeoColl)
-			{
-				SpriteGeometryHelper.SetGeometryBeingEdited(GeoColl, false, false);
+			SetActiveGeometryColor(FrameInstruction->CollisionType, (CollDataToEditIndex == i));
 				
-				SpriteGeometryHelper.DrawGeometry(*View, *PDI, GeometryVertexColorActive, NegativeGeometryVertexColor);
-			}
+			SpriteGeometryHelper.DrawGeometry(*View, *PDI, GeometryVertexColorActive, NegativeGeometryVertexColor);
 		}
 	}
 }
@@ -292,6 +287,14 @@ void FCombatSpriteGeometryEditMode::Tick(FEditorViewportClient* ViewportClient, 
 		MarqueeEndPos = FVector2D(HitX, HitY);
 	}
 
+	// Everytime we detect and edit in current collision data to be edit we clear the selection
+	if (PreviousCollDataToEditIndex != CollDataToEditIndex)
+	{
+		PreviousCollDataToEditIndex = CollDataToEditIndex;
+
+		GetGeometryHelper()->ClearSelectionSet();
+	}
+
 	FEdMode::Tick(ViewportClient, DeltaTime);
 }
 
@@ -364,10 +367,9 @@ void FCombatSpriteGeometryEditMode::SetGeometryColors(const FLinearColor& NewVer
 	NegativeGeometryVertexColor = NewNegativeVertexColor;
 }
 
-void FCombatSpriteGeometryEditMode::SetKeyFrameInstructionsBeingEdited(TArray<FCombatFrameCollisionData>* NewKeyFrameInstructions, int32* NewInstructionToEdit, bool bInAllowCircles, bool bInAllowSubtractivePolygons)
+void FCombatSpriteGeometryEditMode::SetCollFrameDataArrayBeingEdited(TArray<FCombatFrameCollisionData>* NewFrameCollDataArray, bool bInAllowCircles, bool bInAllowSubtractivePolygons)
 {
-	InstructionToEdit = NewInstructionToEdit;
-	KeyFrameInstructions = NewKeyFrameInstructions;
+	FrameCollDataArray = NewFrameCollDataArray;
 	
 	bIsMarqueeTracking = false;
 }
@@ -396,7 +398,7 @@ void FCombatSpriteGeometryEditMode::BindCommands(TSharedPtr<FUICommandList> Comm
 		FIsActionChecked(),
 		FIsActionButtonVisible::CreateRaw(&SpriteGeometryHelper, &FSpriteGeometryEditingHelper::CanAddBoxShape));
 	
-	/*CommandList->MapAction(
+	CommandList->MapAction(
 		Commands.ToggleAddPolygonMode,
 		FExecuteAction::CreateRaw(&SpriteGeometryHelper, &FSpriteGeometryEditingHelper::ToggleAddPolygonMode),
 		FCanExecuteAction::CreateRaw(&SpriteGeometryHelper, &FSpriteGeometryEditingHelper::CanAddPolygon),
@@ -407,7 +409,7 @@ void FCombatSpriteGeometryEditMode::BindCommands(TSharedPtr<FUICommandList> Comm
 		FExecuteAction::CreateSP(this, &FCombatSpriteGeometryEditMode::AddCircleShape),
 		FCanExecuteAction::CreateRaw(&SpriteGeometryHelper, &FSpriteGeometryEditingHelper::CanAddCircleShape),
 		FIsActionChecked(),
-		FIsActionButtonVisible::CreateRaw(&SpriteGeometryHelper, &FSpriteGeometryEditingHelper::CanAddCircleShape));*/
+		FIsActionButtonVisible::CreateRaw(&SpriteGeometryHelper, &FSpriteGeometryEditingHelper::CanAddCircleShape));
 	CommandList->MapAction(
 		Commands.SnapAllVertices,
 		FExecuteAction::CreateRaw(&SpriteGeometryHelper, &FSpriteGeometryEditingHelper::SnapAllVerticesToPixelGrid),
@@ -435,6 +437,16 @@ void FCombatSpriteGeometryEditMode::SetModeTools(FEditorModeTools *ModeTools)
 	Owner = ModeTools;
 }
 
+void FCombatSpriteGeometryEditMode::SetCollDataToEditIndex(int32 newCollDataToEditIndex)
+{
+	CollDataToEditIndex = newCollDataToEditIndex;
+}
+
+int32 FCombatSpriteGeometryEditMode::GetCollDataToEditIndex() const
+{
+	return CollDataToEditIndex;
+}
+
 void FCombatSpriteGeometryEditMode::SetActiveGeometryColor(const ECollisionType InsType, const bool IsActive)
 {	
 	switch(InsType)
@@ -460,9 +472,9 @@ void FCombatSpriteGeometryEditMode::SetActiveGeometryColor(const ECollisionType 
 
 void FCombatSpriteGeometryEditMode::SetEditingGeometry()
 {
-	if (InstructionToEdit != nullptr && KeyFrameInstructions->IsValidIndex(*InstructionToEdit))
+	if (FrameCollDataArray->IsValidIndex(CollDataToEditIndex))
 	{
-		FSpriteGeometryCollection* GeoColl = &KeyFrameInstructions->GetData()[*InstructionToEdit].CollisionGeometry;
+		FSpriteGeometryCollection* GeoColl = &FrameCollDataArray->GetData()[CollDataToEditIndex].CollisionGeometry;
 
 		SpriteGeometryHelper.SetGeometryBeingEdited(GeoColl, false, false);
 	}
