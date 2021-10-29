@@ -17,7 +17,7 @@ FColor FCombatMovesetAssetTypeActions::GetTypeColor() const
 
 UClass* FCombatMovesetAssetTypeActions::GetSupportedClass() const
 {
-	return UCombatFlipbook::StaticClass();
+	return UCombatMoveset::StaticClass();
 }
 
 void FCombatMovesetAssetTypeActions::OpenAssetEditor(const TArray<UObject*>& InObjects, TSharedPtr<class IToolkitHost> EditWithinLevelEditor /*= TSharedPtr<IToolkitHost>()*/)

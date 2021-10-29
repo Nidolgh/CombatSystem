@@ -23,7 +23,7 @@ void FCombat2DEditorModule::StartupModule()
 	IAssetTools& AssetTools = FModuleManager::LoadModuleChecked<FAssetToolsModule>("AssetTools").Get();
 	
 	RegisterAssetTypeAction(AssetTools, MakeShareable(new FCombatFlipbookAssetTypeActions()));
-	//RegisterAssetTypeAction(AssetTools, MakeShareable(new FCombatMovesetAssetTypeActions()));
+	RegisterAssetTypeAction(AssetTools, MakeShareable(new FCombatMovesetAssetTypeActions()));
 
 	FEditorModeRegistry::Get().RegisterMode<FCombatSpriteGeometryEditMode>(
 		FCombatSpriteGeometryEditMode::EM_CombatSpriteGeometry,
