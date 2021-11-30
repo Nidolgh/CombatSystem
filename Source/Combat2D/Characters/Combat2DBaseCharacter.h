@@ -37,6 +37,9 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Animations)
 		class UPaperFlipbook* IdleAnimation;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Combat2D")
+		class UCombatFlipbookComponent* CombatFlipbookComponent;
+
 	/** Called to choose the correct animation to play based on the character's movement state */
 	void UpdateAnimation();
 
@@ -63,6 +66,6 @@ public:
 	/** Returns CameraBoom subobject **/
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
 
-	/*UPROPERTY(EditAnywhere, BlueprintReadWrite, Catefory = Combat2D)
-		class CombatMoveset* CombatMovesetAsset;*/
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Combat2D")
+		class UCombatMoveset* CombatMovesetAsset;
 };

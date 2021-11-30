@@ -22,7 +22,7 @@ struct FCombatFrameCollisionData
 
 	// Collision domain (no collision, 2D, or 3D)
 	UPROPERTY(EditAnywhere, Category=Combat2DFlipbook)
-		TEnumAsByte<ESpriteCollisionMode::Type> SpriteCollisionDomain;
+		TEnumAsByte<ESpriteCollisionMode::Type> SpriteCollisionDomain = ESpriteCollisionMode::Type::Use3DPhysics;
 
 	// Custom collision geometry polygons (in texture space)
 	UPROPERTY(EditAnywhere, Category=Combat2DFlipbook)

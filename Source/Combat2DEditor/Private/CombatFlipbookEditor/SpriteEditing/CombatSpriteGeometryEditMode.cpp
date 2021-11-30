@@ -51,17 +51,17 @@ void FCombatSpriteGeometryEditMode::DrawHUD(FEditorViewportClient* ViewportClien
 {
 	FEdMode::DrawHUD(ViewportClient, Viewport, View, Canvas);
 	
-	if (FrameCollDataArray->IsValidIndex(CollDataToEditIndex))
+	if (FrameCollDataArray != nullptr && FrameCollDataArray->IsValidIndex(CollDataToEditIndex))
 	{
-		// for (size_t i = 0; i < FrameCollDataArray->Num(); i++)
+		for (size_t i = 0; i < FrameCollDataArray->Num(); i++)
 		{
-			FCombatFrameCollisionData* FrameCollData = &FrameCollDataArray->GetData()[CollDataToEditIndex];
+			FCombatFrameCollisionData* FrameCollData = &FrameCollDataArray->GetData()[i];
 			FSpriteGeometryCollection* TheGeometryCollection = &FrameCollData->CollisionGeometry;
 
 			SpriteGeometryHelper.SetGeometryBeingEdited(TheGeometryCollection, true, false);
 
 			SetActiveGeometryColor(FrameCollData->CollisionType, true);
-
+			
 			int32 YPos = 42;
 			SpriteGeometryHelper.DrawGeometry_CanvasPass(*Viewport, *View, *Canvas, YPos, GeometryVertexColorActive, NegativeGeometryVertexColor);
 		}
@@ -77,7 +77,7 @@ void FCombatSpriteGeometryEditMode::Render(const FSceneView* View, FViewport* Vi
 {
 	FEdMode::Render(View, Viewport, PDI);
 
-	if (FrameCollDataArray->IsValidIndex(CollDataToEditIndex))
+	if (FrameCollDataArray != nullptr && FrameCollDataArray->IsValidIndex(CollDataToEditIndex))
 	{
 		for (size_t i = 0; i < FrameCollDataArray->Num(); i++)
 		{
@@ -378,18 +378,16 @@ void FCombatSpriteGeometryEditMode::BindCommands(TSharedPtr<FUICommandList> Comm
 {
 	const FCombatSpriteGeometryEditCommands& Commands = FCombatSpriteGeometryEditCommands::Get();
 
-	// Show toggles
-	//CommandList->MapAction(
-	//	Commands.SetShowNormals,
-	//	FExecuteAction::CreateRaw(&SpriteGeometryHelper, &FSpriteGeometryEditingHelper::ToggleShowNormals),
-	//	FCanExecuteAction(),
-	//	FIsActionChecked::CreateRaw(&SpriteGeometryHelper, &FSpriteGeometryEditingHelper::IsShowNormalsEnabled));
+	CommandList->MapAction(
+		Commands.SetShowNormals,
+		FExecuteAction::CreateRaw(&SpriteGeometryHelper, &FSpriteGeometryEditingHelper::ToggleShowNormals),
+		FCanExecuteAction(),
+		FIsActionChecked::CreateRaw(&SpriteGeometryHelper, &FSpriteGeometryEditingHelper::IsShowNormalsEnabled));
 
-	//// Geometry editing commands
-	//CommandList->MapAction(
-	//	Commands.DeleteSelection,
-	//	FExecuteAction::CreateRaw(&SpriteGeometryHelper, &FSpriteGeometryEditingHelper::DeleteSelectedItems),
-	//	FCanExecuteAction::CreateRaw(&SpriteGeometryHelper, &FSpriteGeometryEditingHelper::CanDeleteSelection));
+	CommandList->MapAction(
+		Commands.DeleteSelection,
+		FExecuteAction::CreateRaw(&SpriteGeometryHelper, &FSpriteGeometryEditingHelper::DeleteSelectedItems),
+		FCanExecuteAction::CreateRaw(&SpriteGeometryHelper, &FSpriteGeometryEditingHelper::CanDeleteSelection));
 	
 	CommandList->MapAction(
 		Commands.AddBoxShape,
@@ -404,12 +402,14 @@ void FCombatSpriteGeometryEditMode::BindCommands(TSharedPtr<FUICommandList> Comm
 		FCanExecuteAction::CreateRaw(&SpriteGeometryHelper, &FSpriteGeometryEditingHelper::CanAddPolygon),
 		FIsActionChecked::CreateRaw(&SpriteGeometryHelper, &FSpriteGeometryEditingHelper::IsAddingPolygon),
 		FIsActionButtonVisible::CreateRaw(&SpriteGeometryHelper, &FSpriteGeometryEditingHelper::CanAddPolygon));
+	
 	CommandList->MapAction(
 		Commands.AddCircleShape,
 		FExecuteAction::CreateSP(this, &FCombatSpriteGeometryEditMode::AddCircleShape),
 		FCanExecuteAction::CreateRaw(&SpriteGeometryHelper, &FSpriteGeometryEditingHelper::CanAddCircleShape),
 		FIsActionChecked(),
 		FIsActionButtonVisible::CreateRaw(&SpriteGeometryHelper, &FSpriteGeometryEditingHelper::CanAddCircleShape));
+	
 	CommandList->MapAction(
 		Commands.SnapAllVertices,
 		FExecuteAction::CreateRaw(&SpriteGeometryHelper, &FSpriteGeometryEditingHelper::SnapAllVerticesToPixelGrid),
@@ -461,13 +461,13 @@ void FCombatSpriteGeometryEditMode::SetActiveGeometryColor(const ECollisionType 
 		GeometryVertexColorActive = GeometryVertexColor;
 	}
 
-	if (!IsActive)
-	{
-		GeometryVertexColorActive.R -= 0.9f;
-		GeometryVertexColorActive.G -= 0.9f;
-		GeometryVertexColorActive.B -= 0.9f;
-		GeometryVertexColorActive.A = 0.1f;
-	}
+	// if (!IsActive)
+	// {
+	// 	GeometryVertexColorActive.R -= 0.9f;
+	// 	GeometryVertexColorActive.G -= 0.9f;
+	// 	GeometryVertexColorActive.B -= 0.9f;
+	// 	GeometryVertexColorActive.A = 0.1f;
+	// }
 }
 
 void FCombatSpriteGeometryEditMode::SetEditingGeometry()

@@ -11,6 +11,7 @@
 #include "Camera/CameraComponent.h"
 
 #include "CombatMoveset.h"
+#include "Combat2D/Components/CombatFlipbookComponent.h"
 
 DEFINE_LOG_CATEGORY_STATIC(Combat2DBaseCharacter, Log, All);
 
@@ -65,6 +66,8 @@ ACombat2DBaseCharacter::ACombat2DBaseCharacter()
 	// Note: This can cause a little floating when going up inclines; you can choose the tradeoff between better
 	// behavior on the edge of a ledge versus inclines by setting this to true or false
 	GetCharacterMovement()->bUseFlatBaseForFloorChecks = true;
+
+	CombatFlipbookComponent = CreateDefaultSubobject<UCombatFlipbookComponent>(TEXT("CombatFlipbookComponent"));
 }
 
 //////////////////////////////////////////////////////////////////////////
