@@ -3,21 +3,17 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "PrimitiveSceneProxy.h"
+#include "Paper2D/Private/PaperRenderSceneProxy.h"
 
-class COMBAT2D_API FCombatFlipbookSceneProxy : public FPrimitiveSceneProxy
+class COMBAT2D_API FCombatFlipbookSceneProxy : public FPaperRenderSceneProxy
 {
 public:
 	FCombatFlipbookSceneProxy(class UCombatFlipbookComponent* InComponent);
 
-	virtual SIZE_T GetTypeHash() const override;
-
-	// FPrimitiveSceneProxy interface
-	virtual uint32 GetMemoryFootprint() const override;
+	// FPrimitiveSceneProxy interface 
 	virtual void GetDynamicMeshElements(const TArray<const FSceneView*>& Views, const FSceneViewFamily& ViewFamily, uint32 VisibilityMap, FMeshElementCollector& Collector) const override;
-	virtual FPrimitiveViewRelevance GetViewRelevance(const FSceneView* View) const override;
-	// End of FPrimitiveSceneProxy interface
+	// End of FPrimitiveSceneProxy interface 
 
 protected:
-	const UBodySetup* BodySetup;
+	bool bDrawDebugCollision;
 };
