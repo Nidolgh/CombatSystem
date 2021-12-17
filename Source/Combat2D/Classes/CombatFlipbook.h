@@ -28,6 +28,9 @@ struct FCombatFrameCollisionData
 	UPROPERTY(EditAnywhere, Category=Combat2DFlipbook)
 		FSpriteGeometryCollection CollisionGeometry;
 
+	UPROPERTY(EditAnywhere, Category = Combat2DFlipbook)
+		UBodySetup* GeneratedBodySetup = nullptr;
+	
 	// The extrusion thickness of collision geometry when using a 3D collision domain
 	UPROPERTY(EditAnywhere, Category=Combat2DFlipbook)
 		float CollisionThickness;
@@ -42,7 +45,7 @@ struct FCombatFrameCollisionData
 };
 
 USTRUCT()
-struct FCombatFrames
+struct FCombatFrame
 {
 	GENERATED_USTRUCT_BODY()
 
@@ -54,15 +57,24 @@ UCLASS()
 class COMBAT2D_API UCombatFlipbook : public UObject
 {
 	GENERATED_BODY()
-
+	
 public:
+	void SetIsDirty(const bool NewState) { bIsDirty = NewState; }
+	bool GetIsDirty() const { return bIsDirty; }
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Combat2DFlipbook)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Combat2DFlipbook")
 		UPaperFlipbook* TargetFlipbook;
 
-	UPROPERTY(EditAnywhere, Category = Combat2DFlipbook)
+	UPROPERTY(EditAnywhere, Category="Combat2DFlipbook")
 		FString Description;
 
-	UPROPERTY(EditAnywhere, Category = Combat2DFlipbook)
-		TArray<FCombatFrames> CombatFramesArray;
+	UPROPERTY(EditAnywhere, Category="Combat2DFlipbook")
+		TArray<FCombatFrame> CombatFramesArray;
+	
+	// for collision generation
+	UPROPERTY(EditAnywhere, Category="Combat2DFlipbook")
+		float UnrealUnitsPerPixel = 1.f;
+	
+private:
+	bool bIsDirty = true;
 };

@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "PaperFlipbookComponent.h"
 
 #include "CombatFlipbookComponent.generated.h"
 
@@ -19,7 +20,7 @@ protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
 
-public:	
+public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
@@ -28,17 +29,27 @@ public:
 	virtual FBoxSphereBounds CalcBounds(const FTransform& LocalToWorld) const override;
 	virtual class UBodySetup* GetBodySetup() override;
 	// End of UPrimitiveComponent interface
-
-	void RebuildCollision();
 	
 	FLinearColor GetWireframeColor() const;
 
+	void SetActiveCombatFlipbook(class UCombatFlipbook* NewActiveCombatFlipbook);
+	void SetPaperFlipbookComponent(UPaperFlipbookComponent* NewPaperFlipbookComp);
+
+	void SetActiveBodySetupCombatFrame();
+
 	UPROPERTY(EditAnywhere, Category="Main")
-	class UBodySetup* BodySetup;
+		class UBodySetup* ActiveBodySetup;
 	
 	UPROPERTY(EditAnywhere, Category="Main")
 	class UCombatFlipbook* ActiveCombatFlipbook;
-//
-// protected:
-// 	friend class FCombatFlipbookSceneProxy;
+
+	UPROPERTY(EditAnywhere, Category="Main")
+	float OverwriteUnrealUnitsPerPixel;
+
+protected:
+	const UPaperFlipbookComponent* OwnerPaperFlipbookComp;
+	
+	class FCombatFlipbookSceneProxy* CombatFlipbookSceneProxy;
+
+	int32 PreviousFrameIndex;
 };

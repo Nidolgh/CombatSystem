@@ -151,7 +151,7 @@ void FCombatMovesetEditor::InitCombatMovesetEditor(
         StandaloneDefaultLayout,
         bCreateDefaultStandaloneMenu,
         bCreateDefaultToolbar,
-        reinterpret_cast<UObject *>(InMoveset));
+        InMoveset);
 
     ExtendToolbar();
     RegenerateMenusAndToolbars();

@@ -137,7 +137,7 @@ void FCombatFlipbookEditor::InitCombatFlipbookEditor(const EToolkitMode::Type Mo
 		StandaloneDefaultLayout,
 		bCreateDefaultStandaloneMenu,
 		bCreateDefaultToolbar,
-		reinterpret_cast<UObject*>(InCombatFlipbook));
+		InCombatFlipbook);
 
 	ActivateEditMode();
 	
@@ -199,11 +199,11 @@ UPaperFlipbook* FCombatFlipbookEditor::GetFlipbookBeingEdited() const
 	return CombatFlipbookBeingEdited->TargetFlipbook;
 }
 
-FCombatFrames* FCombatFlipbookEditor::CreateKeyFrameDataOnCurrentFrame()
+FCombatFrame* FCombatFlipbookEditor::CreateKeyFrameDataOnCurrentFrame()
 {
 	const int32 curFrame = GetCurrentFrame();
 
-	TArray<FCombatFrames>& keyFrameArray = GetCombatFlipbookBeingEdited()->CombatFramesArray;
+	TArray<FCombatFrame>& keyFrameArray = GetCombatFlipbookBeingEdited()->CombatFramesArray;
 
 	while (!keyFrameArray.IsValidIndex(curFrame))
 	{
@@ -230,7 +230,7 @@ void FCombatFlipbookEditor::CreateKeyFrameInstructionOnCurrentFrame()
 		return;
 	}
 
-	TArray<FCombatFrames>& keyFrameArray = GetCombatFlipbookBeingEdited()->CombatFramesArray;
+	TArray<FCombatFrame>& keyFrameArray = GetCombatFlipbookBeingEdited()->CombatFramesArray;
 
 	if (keyFrameArray.IsValidIndex(curFrame))
 	{

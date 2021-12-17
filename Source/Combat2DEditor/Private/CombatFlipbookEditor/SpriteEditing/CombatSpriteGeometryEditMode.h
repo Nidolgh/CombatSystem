@@ -52,7 +52,7 @@ public:
 	void SetGeometryColors(const FLinearColor& NewVertexColor, const FLinearColor& NewNegativeVertexColor);
 
 	// Changes the geometry being edited (clears the selection set in the process)
-	void SetCollFrameDataArrayBeingEdited(TArray<FCombatFrameCollisionData>* NewFrameCollDataArray, bool bInAllowCircles, bool bInAllowSubtractivePolygons);
+	void SetCurrentCombatFrame(FCombatFrame* NewCombatFrame);
 	
 	void BindCommands(TSharedPtr<FUICommandList> InCommandList);
 
@@ -85,7 +85,8 @@ protected:
 	// Sprite geometry editing/rendering helper
 	FSpriteGeometryEditingHelper SpriteGeometryHelper;
 
-	TArray<FCombatFrameCollisionData>* FrameCollDataArray;
+	FCombatFrame* CurrentCombatFrame;
+	
 	int32 CollDataToEditIndex;
 	int32 PreviousCollDataToEditIndex;
 	

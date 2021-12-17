@@ -108,7 +108,6 @@ public:
 	void SelectGeometry(const FShapeVertexPair& GeometyItem);
 	bool IsGeometrySelected(const FShapeVertexPair& GeometyItem) const;
 
-
 	void AddShapeToSelection(const int32 ShapeIndex);
 	void AddPolygonVertexToSelection(const int32 ShapeIndex, const int32 VertexIndex);
 	void AddPolygonEdgeToSelection(const int32 ShapeIndex, const int32 FirstVertexIndex);

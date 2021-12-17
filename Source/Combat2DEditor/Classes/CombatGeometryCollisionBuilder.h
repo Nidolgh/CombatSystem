@@ -16,6 +16,10 @@ public:
 
 	virtual void ProcessGeometry(const FSpriteGeometryCollection& InGeometry);
 	virtual void Finalize();
+
+	void SetUnrealUnitsPerPixel(const float NewUnrealUnitsPerPixel);
+	void SetCollisionThickness(const float NewCollisionThickness);
+	
 protected:
 	void AddBoxCollisionShapesToBodySetup(const FSpriteGeometryCollection& InGeometry);
 	void AddPolygonCollisionShapesToBodySetup(const FSpriteGeometryCollection& InGeometry);

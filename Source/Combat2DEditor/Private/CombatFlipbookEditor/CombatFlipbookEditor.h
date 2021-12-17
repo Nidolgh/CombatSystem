@@ -55,7 +55,7 @@ public:
 
 	SFrameCollisionDataTab* GetGeoPropTabBody() const { return FrameCollisionDataTab.Get(); }
 
-	FCombatFrames* CreateKeyFrameDataOnCurrentFrame();
+	FCombatFrame* CreateKeyFrameDataOnCurrentFrame();
 	void CreateKeyFrameInstructionOnCurrentFrame();
 	int32 GetCurrentFrame() const;
 

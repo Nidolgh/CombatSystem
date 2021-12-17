@@ -2,9 +2,10 @@
 
 #include "CombatFlipbook.h"
 #include "CombatFlipbookEditor/CombatFlipbookEditor.h"
+#include "Components/SlateWrapperTypes.h"
 
 void SFrameCollisionDataTab::Construct(const FArguments &InArgs, 
-        TSharedPtr<FCombatFlipbookEditor> InFlipbookEditor)
+                                       TSharedPtr<FCombatFlipbookEditor> InFlipbookEditor)
 {
     CombatFlipbookEditorPtr = InFlipbookEditor;
 
@@ -110,48 +111,53 @@ void SFrameCollisionDataTab::Rebuild()
                 SNew(STextBlock)
                 .Text(FText::FromString("Type:"))
             ];
-
-        ECollisionType& CollisionTypeRef = KFArray->GetData()[ButtonFrameInstructionID].CollisionType;
-        
-        for (size_t i = 0; i < static_cast<size_t>(ECollisionType::Count); i++)
+            
+        if (KFArray->IsValidIndex(ButtonFrameInstructionID))
         {
-            FString InsTypeString("");
-            FLinearColor InsTypeLColor(FLinearColor::White);
-            const ECollisionType CurType = static_cast<ECollisionType>(i);
-            
-            switch (CurType)
+            ECollisionType& CollisionTypeRef = KFArray->GetData()[ButtonFrameInstructionID].CollisionType;
+        
+            for (size_t i = 0; i < static_cast<size_t>(ECollisionType::Count); i++)
             {
-            case ECollisionType::HitBox:
-                InsTypeString = TEXT("HitBox");
-                break;
-            case ECollisionType::HurtBox:
-                InsTypeString = TEXT("HurtBox");
-                break;
-            default: 
-                InsTypeString = TEXT("Type undefined!");
-            }
-
-            if (CurType != CollisionTypeRef)
-            {
-                InsTypeLColor = FLinearColor(0.2f, 0.2f, 0.2f, 1.f);
-            }
+                FString InsTypeString("");
+                FLinearColor InsTypeLColor(FLinearColor::White);
+                const ECollisionType CurType = static_cast<ECollisionType>(i);
             
-            MainBoxPtr->AddSlot()
-                .AutoHeight()[
-                    SNew(SButton)
-                        .Text(FText::FromString(InsTypeString))
-                        .ButtonColorAndOpacity(FSlateColor(InsTypeLColor))
-                        .OnClicked_Lambda([this, i, &CollisionTypeRef]() mutable
-                        {
-                            CollisionTypeRef = static_cast<ECollisionType>(i);
+                switch (CurType)
+                {
+                case ECollisionType::HitBox:
+                    InsTypeString = TEXT("HitBox");
+                    break;
+                case ECollisionType::HurtBox:
+                    InsTypeString = TEXT("HurtBox");
+                    break;
+                default: 
+                    InsTypeString = TEXT("Type undefined!");
+                }
 
-                            Rebuild();
+                if (CurType != CollisionTypeRef)
+                {
+                    InsTypeLColor = FLinearColor(0.2f, 0.2f, 0.2f, 1.f);
+                }
+            
+                MainBoxPtr->AddSlot()
+                    .AutoHeight()[
+                        SNew(SButton)
+                            .Text(FText::FromString(InsTypeString))
+                            .ButtonColorAndOpacity(FSlateColor(InsTypeLColor))
+                            .OnClicked_Lambda([this, i, &CollisionTypeRef]() mutable
+                            {
+                                CollisionTypeRef = static_cast<ECollisionType>(i);
+
+                                Rebuild();
                             
-                            return FReply::Handled();
-                        })
-                ];
+                                return FReply::Handled();
+                            })
+                    ];
+            }
         }
     }
+
+    BuildGenerateBodySetupButton();
 }
 
 void SFrameCollisionDataTab::Tick(const FGeometry& AllottedGeometry, const double InCurrentTime, const float InDeltaTime)
@@ -179,4 +185,22 @@ void SFrameCollisionDataTab::Tick(const FGeometry& AllottedGeometry, const doubl
 int32 SFrameCollisionDataTab::GetButtonFrameID()
 {
     return ButtonFrameInstructionID;
+}
+
+void SFrameCollisionDataTab::BuildGenerateBodySetupButton()
+{
+    MainBoxPtr->AddSlot()
+                .AutoHeight()[
+                    SNew(SButton)
+                        .Text(FText::FromString("Generate Bodysetup"))
+                        .ButtonColorAndOpacity(FLinearColor::White)
+                        .OnClicked(this, &SFrameCollisionDataTab::OnGenerateBodySetup)
+                ];
+}
+
+FReply SFrameCollisionDataTab::OnGenerateBodySetup() const
+{
+    CombatFlipbookEditorPtr.Pin()->GetCombatFlipbookBeingEdited()->SetIsDirty(true);
+    
+    return FReply::Handled();
 }

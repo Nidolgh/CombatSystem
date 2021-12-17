@@ -7,7 +7,7 @@
 FCombatGeometryCollisionBuilder::FCombatGeometryCollisionBuilder(UBodySetup* InBodySetup)
 	: MyBodySetup(InBodySetup)
 	, UnrealUnitsPerPixel(1.0f)
-	, CollisionThickness(64.0f)
+	, CollisionThickness(32.0f)
 	, ZOffsetAmount(0.0f)
 	, CollisionDomain(ESpriteCollisionMode::Use3DPhysics)
 {
@@ -31,6 +31,16 @@ void FCombatGeometryCollisionBuilder::Finalize()
 	// Rebuild the body setup
 	MyBodySetup->InvalidatePhysicsData();
 	MyBodySetup->CreatePhysicsMeshes();
+}
+
+void FCombatGeometryCollisionBuilder::SetUnrealUnitsPerPixel(const float NewUnrealUnitsPerPixel)
+{
+	UnrealUnitsPerPixel = NewUnrealUnitsPerPixel;
+}
+
+void FCombatGeometryCollisionBuilder::SetCollisionThickness(const float NewCollisionThickness)
+{
+	CollisionThickness = NewCollisionThickness;
 }
 
 void FCombatGeometryCollisionBuilder::AddBoxCollisionShapesToBodySetup(const FSpriteGeometryCollection& InGeometry)

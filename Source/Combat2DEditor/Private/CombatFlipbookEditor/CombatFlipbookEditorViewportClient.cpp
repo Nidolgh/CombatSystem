@@ -13,7 +13,7 @@
 #include "CombatFlipbookEditor.h"
 
 #include "PaperFlipbookComponent.h"
-#include "SpriteEditing/CombatSpriteGeometryEditCommands.h"
+#include "CombatGeometryCollisionBuilder.h"
 
 #include "CombatFlipbook.h"
 
@@ -142,6 +142,8 @@ void FCombatFlipbookEditorViewportClient::Tick(float DeltaSeconds)
 	HandleKeyFrameChange();
 	HandleCollisionDataIndexChange();
 	
+	RegenerateCombatFramesBodySetups();
+
 	if (AnimatedRenderComponent.IsValid())
 	{		
 		UPaperFlipbook* Flipbook = CombatFlipbookBeingEdited.Get()->TargetFlipbook;
@@ -325,7 +327,7 @@ UPaperSprite* FCombatFlipbookEditorViewportClient::GetSpriteOnCurrentFrame() con
 	return CombatFlipbookBeingEdited.Get()->TargetFlipbook->GetSpriteAtFrame(curFrame);
 }
 
-FCombatFrames* FCombatFlipbookEditorViewportClient::GetCombatFrameDataOnCurrentFrame() const
+FCombatFrame* FCombatFlipbookEditorViewportClient::GetCombatFrameDataOnCurrentFrame() const
 {
 	const int32 curFrame = CombatFlipbookEditorPtr.Pin().Get()->GetCurrentFrame();
 
@@ -340,6 +342,54 @@ FCombatFrames* FCombatFlipbookEditorViewportClient::GetCombatFrameDataOnCurrentF
 UPaperFlipbookComponent * FCombatFlipbookEditorViewportClient::GetPreviewComponent() const
 {
 	return AnimatedRenderComponent.Get();
+}
+
+void FCombatFlipbookEditorViewportClient::RegenerateCombatFramesBodySetups() const
+{
+	UCombatFlipbook* ActiveCombatFlipbook = CombatFlipbookBeingEdited.Get();
+	
+	if (ActiveCombatFlipbook == nullptr)
+		return;
+	
+	if (ActiveCombatFlipbook->GetIsDirty())
+	{
+		for (FCombatFrame& CombatFrame : ActiveCombatFlipbook->CombatFramesArray)
+		{
+			for (FCombatFrameCollisionData& FrameCollisionData : CombatFrame.CollisionDataArray)
+			{
+				FSpriteGeometryCollection& GeometryCollection = FrameCollisionData.CollisionGeometry;
+
+				UBodySetup* OldBodySetup = FrameCollisionData.GeneratedBodySetup;
+				UBodySetup* NewBodySetup = NewObject<UBodySetup>();
+				
+				FrameCollisionData.GeneratedBodySetup = NewBodySetup;
+
+				check(FrameCollisionData.GeneratedBodySetup);
+				NewBodySetup->CollisionTraceFlag = CTF_UseSimpleAsComplex;
+
+				// Clean up the geometry (converting polygons back to bounding boxes, etc...)
+				GeometryCollection.ConditionGeometry();
+
+				// Take the geometry and add it to the body setup
+				FCombatGeometryCollisionBuilder CollisionBuilder(FrameCollisionData.GeneratedBodySetup);
+				CollisionBuilder.SetUnrealUnitsPerPixel(ActiveCombatFlipbook->UnrealUnitsPerPixel);
+				CollisionBuilder.ProcessGeometry(GeometryCollection);
+				CollisionBuilder.Finalize();
+	
+				// Copy across or initialize the only editable property we expose on the body setup
+				if (OldBodySetup != nullptr)
+				{
+					NewBodySetup->DefaultInstance.CopyBodyInstancePropertiesFrom(&(OldBodySetup->DefaultInstance));
+				}
+				else
+				{
+					NewBodySetup->DefaultInstance.SetCollisionProfileName(UCollisionProfile::BlockAllDynamic_ProfileName);
+				}
+			}
+		}
+	}
+	
+	ActiveCombatFlipbook->SetIsDirty(false);
 }
 
 FBox FCombatFlipbookEditorViewportClient::GetDesiredFocusBounds() const
@@ -357,7 +407,7 @@ void FCombatFlipbookEditorViewportClient::HandleKeyFrameChange()
 
 		if (CurrentKeyFrameData->CollisionDataArray.Num() != 0)
 		{
-			GeometryEditMode->SetCollFrameDataArrayBeingEdited(&CurrentKeyFrameData->CollisionDataArray, /*bAllowCircles=*/ true, /*bAllowSubtractivePolygons=*/ false);
+			GeometryEditMode->SetCurrentCombatFrame(CurrentKeyFrameData);
 		}else
 		{
 			UE_LOG(LogTemp, Warning, TEXT("No frame instruction collection set"));

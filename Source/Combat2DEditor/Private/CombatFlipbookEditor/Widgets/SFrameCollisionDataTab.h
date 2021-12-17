@@ -14,13 +14,18 @@ public:
 			TSharedPtr<FCombatFlipbookEditor> InFlipbookEditor);
 
 	void Rebuild();
-
+	
 	// SWidget interface
 	virtual void Tick(const FGeometry& AllottedGeometry, const double InCurrentTime, const float InDeltaTime) override;
 	// End of SWidget interface
 
 	int32 GetButtonFrameID();
 
+protected:
+	void BuildGenerateBodySetupButton();
+
+	FReply OnGenerateBodySetup() const;
+	
 private:
 	// Pointer back to owning sprite editor instance (the keeper of state)
 	TWeakPtr<class FCombatFlipbookEditor> CombatFlipbookEditorPtr;

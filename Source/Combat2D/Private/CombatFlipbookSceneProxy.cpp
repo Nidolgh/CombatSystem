@@ -24,21 +24,18 @@ void FCombatFlipbookSceneProxy::GetDynamicMeshElements(const TArray<const FScene
 	
 	for (int32 ViewIndex = 0; ViewIndex < Views.Num(); ViewIndex++)
 	{
-		if (VisibilityMap & (1 << ViewIndex))
+		//if (VisibilityMap & (1 << ViewIndex))
 		{
 			if (bDrawDebugCollision)
 			{
 				const FSceneView* View = Views[ViewIndex];
 				DebugDrawCollision(View, ViewIndex, Collector, false);
 			}
-
-			// Draw bounds
-			#if !(UE_BUILD_SHIPPING || UE_BUILD_TEST)
-			if (EngineShowFlags.Paper2DSprites)
-			{
-				RenderBounds(Collector.GetPDI(ViewIndex), EngineShowFlags, GetBounds(), (Owner == nullptr) || IsSelected());
-			}
-#endif
 		}
 	}
+}
+
+void FCombatFlipbookSceneProxy::SetActiveBodySetup(UBodySetup* NewBodySetup)
+{
+	MyBodySetup = NewBodySetup;
 }

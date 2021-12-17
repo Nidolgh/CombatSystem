@@ -77,7 +77,7 @@ public:
 	}
 
 	UPaperSprite* GetSpriteOnCurrentFrame() const;
-	FCombatFrames* GetCombatFrameDataOnCurrentFrame() const;
+	FCombatFrame* GetCombatFrameDataOnCurrentFrame() const;
 	
 	UPaperFlipbookComponent* GetPreviewComponent() const;
 
@@ -87,6 +87,8 @@ public:
 	FCombatSpriteGeometryEditMode* GeometryEditMode;
 
 protected:
+	void RegenerateCombatFramesBodySetups() const;
+	
 	/** Checkerboard texture */
 	UTexture2D* CheckerboardTexture;
 	FVector2D ZoomPos;
@@ -130,6 +132,6 @@ private:
 	// Did we dirty something during manipulation?
 	bool bManipulationDirtiedSomething;
 
-	FCombatFrames* CurrentKeyFrameData = nullptr;
-	FCombatFrames* LastKeyFrameData = nullptr;
+	FCombatFrame* CurrentKeyFrameData = nullptr;
+	FCombatFrame* LastKeyFrameData = nullptr;
 };

@@ -3,51 +3,78 @@
 #include "CombatFlipbookComponent.h"
 #include "CombatFlipbook.h"
 #include "CombatFlipbookSceneProxy.h"
-#include "CombatGeometryCollisionBuilder.h"
-#include "SpriteDrawCall.h"
 #include "Engine/CollisionProfile.h"
 
 // Sets default values for this component's properties
 UCombatFlipbookComponent::UCombatFlipbookComponent()
+	: OwnerPaperFlipbookComp(nullptr)
+	, PreviousFrameIndex(-1)
 {
 	BodyInstance.SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
-
-	BodySetup = nullptr;
+	
+	ActiveBodySetup = nullptr;
 }
 
 // Called when the game starts
 void UCombatFlipbookComponent::BeginPlay()
 {
 	Super::BeginPlay();
-	
-	RebuildCollision();
 }
 
 
 // Called every frame
 void UCombatFlipbookComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
+	SetActiveBodySetupCombatFrame();
+	
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+}
+
+void UCombatFlipbookComponent::SetActiveBodySetupCombatFrame()
+{
+	if (!IsValid(OwnerPaperFlipbookComp) && !IsValid(ActiveCombatFlipbook))
+		return;
+	
+	const int32 CurFrameIndex = OwnerPaperFlipbookComp->GetPlaybackPositionInFrames();
+
+	if (PreviousFrameIndex == CurFrameIndex)
+		return;
+	
+	PreviousFrameIndex = CurFrameIndex;
+
+	if (!ActiveCombatFlipbook->CombatFramesArray.IsValidIndex(CurFrameIndex))
+		return;
+	
+	TArray<FCombatFrameCollisionData>& CombatFrameCollisionData = ActiveCombatFlipbook->CombatFramesArray[CurFrameIndex].CollisionDataArray;
+
+	if (!CombatFrameCollisionData.IsValidIndex(0))
+		return;
+	
+	ActiveBodySetup = CombatFrameCollisionData[0].GeneratedBodySetup; // TODO fix collision types
+
+	CombatFlipbookSceneProxy->SetActiveBodySetup(ActiveBodySetup);
+
+	RecreatePhysicsState();
+	UpdateBounds();
 }
 
 FPrimitiveSceneProxy* UCombatFlipbookComponent::CreateSceneProxy()
 {
-	FCombatFlipbookSceneProxy* NewProxy = new FCombatFlipbookSceneProxy(this);
-	
-	return NewProxy;
+	CombatFlipbookSceneProxy = new FCombatFlipbookSceneProxy(this);
+	return CombatFlipbookSceneProxy;
 }
 
 FBoxSphereBounds UCombatFlipbookComponent::CalcBounds(const FTransform& LocalToWorld) const
 {
-	if (BodySetup != nullptr)
+	if (ActiveBodySetup != nullptr)
 	{
 		FBoxSphereBounds NewBounds;
 
-		const FBox AggGeomBox = BodySetup->AggGeom.CalcAABB(LocalToWorld);
+		const FBox AggGeomBox = ActiveBodySetup->AggGeom.CalcAABB(LocalToWorld);
 		if (AggGeomBox.IsValid)
 		{
 			NewBounds = Union(NewBounds,FBoxSphereBounds(AggGeomBox));
@@ -65,59 +92,7 @@ FBoxSphereBounds UCombatFlipbookComponent::CalcBounds(const FTransform& LocalToW
 
 UBodySetup* UCombatFlipbookComponent::GetBodySetup()
 {
-	return BodySetup == nullptr ? Super::GetBodySetup() : BodySetup;
-}
-
-void UCombatFlipbookComponent::RebuildCollision()
-{
-	UBodySetup* OldBodySetup = BodySetup;
-
-	if (ActiveCombatFlipbook == nullptr)
-		return;
-	
-	FCombatFrameCollisionData& CollisionData = ActiveCombatFlipbook->CombatFramesArray[0].CollisionDataArray[0];
-	FSpriteGeometryCollection& CollisionGeometry = CollisionData.CollisionGeometry;
-	
-	// Ensure we have the data structure for the desired collision method
-	switch (CollisionData.SpriteCollisionDomain)
-	{
-	case ESpriteCollisionMode::Use3DPhysics:
-		BodySetup = NewObject<UBodySetup>(this);
-		break;
-	case ESpriteCollisionMode::None:
-	default:
-		BodySetup = nullptr;
-		CollisionGeometry.Reset();
-		break;
-	}
-	
-	if (CollisionData.SpriteCollisionDomain != ESpriteCollisionMode::None)
-	{
-		check(BodySetup);
-		BodySetup->CollisionTraceFlag = CTF_UseSimpleAsComplex;
-	
-		// Clean up the geometry (converting polygons back to bounding boxes, etc...)
-		CollisionGeometry.ConditionGeometry();
-	
-		// Take the geometry and add it to the body setup
-		FCombatGeometryCollisionBuilder CollisionBuilder(BodySetup);
-		CollisionBuilder.ProcessGeometry(CollisionGeometry);
-		CollisionBuilder.Finalize();
-		
-		RecreatePhysicsState();
-    	UpdateBounds();
-		
-
-		// Copy across or initialize the only editable property we expose on the body setup
-		if (OldBodySetup != nullptr)
-		{
-			BodySetup->DefaultInstance.CopyBodyInstancePropertiesFrom(&(OldBodySetup->DefaultInstance));
-		}
-		else
-		{
-			BodySetup->DefaultInstance.SetCollisionProfileName(UCollisionProfile::BlockAllDynamic_ProfileName);
-		}
-	}
+	return ActiveBodySetup == nullptr ? Super::GetBodySetup() : ActiveBodySetup;
 }
 
 FLinearColor UCombatFlipbookComponent::GetWireframeColor() const
@@ -137,5 +112,19 @@ FLinearColor UCombatFlipbookComponent::GetWireframeColor() const
 			return FColor(255, 0, 255, 255);
 		}
 	}
+}
+
+void UCombatFlipbookComponent::SetActiveCombatFlipbook(UCombatFlipbook* NewActiveCombatFlipbook)
+{
+	RecreatePhysicsState();
+	UpdateBounds();
+
+	ActiveCombatFlipbook = NewActiveCombatFlipbook;
+}
+
+void UCombatFlipbookComponent::SetPaperFlipbookComponent(UPaperFlipbookComponent* NewPaperFlipbookComp)
+{
+	OwnerPaperFlipbookComp = NewPaperFlipbookComp;
+	PreviousFrameIndex = NewPaperFlipbookComp->GetPlaybackPositionInFrames();
 }
 

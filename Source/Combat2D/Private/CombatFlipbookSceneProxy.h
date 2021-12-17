@@ -14,6 +14,8 @@ public:
 	virtual void GetDynamicMeshElements(const TArray<const FSceneView*>& Views, const FSceneViewFamily& ViewFamily, uint32 VisibilityMap, FMeshElementCollector& Collector) const override;
 	// End of FPrimitiveSceneProxy interface 
 
+	void SetActiveBodySetup(UBodySetup* NewBodySetup);
+
 protected:
 	bool bDrawDebugCollision;
 };

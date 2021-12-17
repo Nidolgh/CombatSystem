@@ -68,6 +68,7 @@ ACombat2DBaseCharacter::ACombat2DBaseCharacter()
 	GetCharacterMovement()->bUseFlatBaseForFloorChecks = true;
 
 	CombatFlipbookComponent = CreateDefaultSubobject<UCombatFlipbookComponent>(TEXT("CombatFlipbookComponent"));
+	CombatFlipbookComponent->SetPaperFlipbookComponent(GetSprite());
 }
 
 //////////////////////////////////////////////////////////////////////////
