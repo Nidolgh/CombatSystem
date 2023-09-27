@@ -4,3 +4,10 @@ Adds a new AnimNotifyState and editor extensions to allow for certain collider s
 Interfaces with the Gameplay Ability System and Damage systems to handle varying events.
 
 ![CombatSystem_Preview_0](https://github.com/Nidolgh/CombatSystem/assets/39389180/0126b93f-d8f4-4896-add7-a6b594e735e0)
+
+## Console Commands
+
+```CombatSystem.DrawDebugShapes``` 
+
+- 0 = No debug shapes during gameplay
+- 1 = Draw debug shapes during gameplay
