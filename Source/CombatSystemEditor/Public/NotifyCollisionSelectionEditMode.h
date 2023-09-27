@@ -26,7 +26,7 @@ public:
 	
 private:
 	UShapeComponent* SelectedShapeComponent;
-	void Test();
+	
 	/** Whether we are currently in a manipulation  */
 	bool bManipulating;	
 

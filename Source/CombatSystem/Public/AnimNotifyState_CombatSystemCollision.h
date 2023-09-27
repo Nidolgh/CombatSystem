@@ -65,5 +65,9 @@ protected:
 	UPROPERTY(EditAnywhere, Category="PointDamage | Data", meta = (EditCondition = "bApplyPointDamageToTarget", EditConditionHides))
 	TSubclassOf<UDamageType> DamageTypeClass;
 
-	TArray<AActor*> ActorsWeHaveOverlape+
+	UPROPERTY(EditAnywhere)
+	bool bOnlyOverlapOncePerActor;
+	
+	UPROPERTY()
+	TArray<AActor*> ActorsWeHaveOverlapped;
 };

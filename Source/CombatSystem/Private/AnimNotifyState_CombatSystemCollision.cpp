@@ -18,6 +18,7 @@ UAnimNotifyState_CombatSystemCollision::UAnimNotifyState_CombatSystemCollision()
 	, OwnerAbilityComponent(nullptr)
 	, bApplyPointDamageToTarget(false)
 	, BaseDamage(1.0f)
+	, bOnlyOverlapOncePerActor(false)
 {
 #ifdef WITH_EDITOR
 	LastKnownShapeInfosNum = CollisionShapeInfos.Num();
@@ -32,6 +33,11 @@ void UAnimNotifyState_CombatSystemCollision::NotifyBegin(USkeletalMeshComponent*
 	Super::NotifyBegin(MeshComp, Animation, TotalDuration, EventReference);
 
 	CurrentOwner = MeshComp->GetOwner();
+
+	if (bOnlyOverlapOncePerActor)
+	{
+		ActorsWeHaveOverlapped.Empty();
+	}
 
 	// Lets get our GAS component if we have one
 	if (CurrentOwner != nullptr)
@@ -127,6 +133,16 @@ void UAnimNotifyState_CombatSystemCollision::NotifyTick(USkeletalMeshComponent* 
 		// Lets do some GAS
 		for (const FHitResult& HitResult : HitResults)
 		{
+			if (bOnlyOverlapOncePerActor)
+			{
+				if (ActorsWeHaveOverlapped.Contains(HitResult.GetActor()))
+				{
+					continue;
+				}
+			
+				ActorsWeHaveOverlapped.Add(HitResult.GetActor());
+			}
+			
 			const IAbilitySystemInterface* AbilitySystemInterface = Cast<IAbilitySystemInterface>(HitResult.GetActor());
 			if (AbilitySystemInterface != nullptr)
 			{
