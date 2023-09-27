@@ -10,6 +10,7 @@
 #include "Components/SphereComponent.h"
 #include "GameFramework/Character.h"
 #include "Kismet/GameplayStatics.h"
+#include "PhysicsEngine/PhysicsSettings.h"
 
 #define LOCTEXT_NAMESPACE "AnimNotifyState_CombatSystemCollision"
 
@@ -126,9 +127,16 @@ void UAnimNotifyState_CombatSystemCollision::NotifyTick(USkeletalMeshComponent* 
 		default: ;
 		}
 		
+		FCollisionQueryParams Params;
+		Params.bTraceComplex = false;
+		Params.bReturnPhysicalMaterial = true;
+		Params.bReturnFaceIndex = !UPhysicsSettings::Get()->bSuppressFaceRemapTable; // Ask for face index, as long as we didn't disable globally
+		Params.AddIgnoredActor(CurrentOwner);
+		
 		FCollisionObjectQueryParams ObjectParams;
+
 		TArray<FHitResult> HitResults;
-		CurrentOwner->GetWorld()->SweepMultiByObjectType(HitResults, Loc, Loc, WorldTransform.GetRotation(), ObjectParams, CollShape);
+		CurrentOwner->GetWorld()->SweepMultiByObjectType(HitResults, Loc, Loc, WorldTransform.GetRotation(), ObjectParams, CollShape, Params);
 
 		// Lets do some GAS
 		for (const FHitResult& HitResult : HitResults)
@@ -163,13 +171,15 @@ void UAnimNotifyState_CombatSystemCollision::NotifyTick(USkeletalMeshComponent* 
 				}
 			}
 
-			if (bApplyPointDamageToTarget && OwnerAbilityComponent->AbilityActorInfo.IsValid())
+			if (bApplyPointDamageToTarget)
 			{
-				auto PlayerController = OwnerAbilityComponent->AbilityActorInfo->PlayerController;
-				if (PlayerController.IsValid())
+				APlayerController* ControllerInstigator = nullptr;
+				if (OwnerAbilityComponent->AbilityActorInfo.IsValid())
 				{
-					UGameplayStatics::ApplyPointDamage(HitResult.GetActor(), BaseDamage, HitResult.ImpactNormal, HitResult, PlayerController.Get(), PlayerController.Get(), DamageTypeClass);
+					ControllerInstigator = OwnerAbilityComponent->AbilityActorInfo->PlayerController.Get();
 				}
+
+				UGameplayStatics::ApplyPointDamage(HitResult.GetActor(), BaseDamage, HitResult.ImpactNormal, HitResult, ControllerInstigator, CurrentOwner, DamageTypeClass);
 			}
 		}
 	}
